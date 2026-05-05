@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Models\Stream;
 
@@ -10,19 +12,17 @@ class AdminController extends Controller
 {
     public function Dashboard()
     {
-        $stream = Stream::first();
+        // Fetch only the currently active stream
+        $activeStream = Stream::where('is_active', true)->first();
 
         return Inertia::render('Admin/Dashboard', [
             'currentStream' => [
-                'title' => $stream->title ?? 'Sila Kemaskini Tajuk',
-                'url'   => $stream->stream_url ?? '',
-            ],
-            'pendingWorks' => [
-                ['stream_id' => 1, 'title' => 'Dokumentasi Hulu Langat', 'type' => 'Video', 'creator' => 'Unit Media'],
+                'title' => '',
+                'url'   =>  '',
             ],
             'stats' => [
-                'active_users' => 1250,
-                'total_views' => 45800,
+                'active_users' => 0,
+                'total_views'  => 0,
             ]
         ]);
     }
@@ -34,22 +34,38 @@ class AdminController extends Controller
             'url'   => 'required|string',
         ]);
 
-        $url = $validated['url'];
-        $videoId = $url;
+        $videoId = $this->extractYoutubeId($validated['url']);
 
-        if (str_contains($url, 'youtube.com/watch?v=')) {
-            parse_str(parse_url($url, PHP_URL_QUERY), $params);
-            $videoId = $params['v'] ?? $url;
-        } elseif (str_contains($url, 'youtu.be/')) {
-            $videoId = basename(parse_url($url, PHP_URL_PATH));
+        DB::transaction(function () use ($validated, $videoId) {
+            Stream::where('is_active', true)->update(['is_active' => false]);
+            Stream::create([
+                'title'      => $validated['title'],
+                'stream_url' => $videoId,
+                'admin_id'   => Auth::id() ?? 1,
+                'is_active'  => true,
+            ]);
+        });
+
+        return back()->with('message', 'Siaran baharu telah diterbitkan!');
+    }
+
+    private function extractYoutubeId(string $url): string
+    {
+        if (preg_match('/^[a-zA-Z0-9_-]{11}$/', $url)) {
+            return $url;
         }
 
-        $stream = Stream::first() ?? new Stream();
-        $stream->title = $validated['title'];
-        $stream->stream_url = $videoId;
-        $stream->admin_id = auth()->id() ?? 1;
-        $stream->save();
+        $parts = parse_url($url);
 
-        return back()->with('message', 'Portal Multimedia telah dikemaskini!');
+        if (isset($parts['host']) && ($parts['host'] === 'youtu.be' || $parts['host'] === 'www.youtu.be')) {
+            return ltrim($parts['path'], '/');
+        }
+
+        if (isset($parts['query'])) {
+            parse_str($parts['query'], $query);
+            return $query['v'] ?? $url;
+        }
+
+        return $url;
     }
 }

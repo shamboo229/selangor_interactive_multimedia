@@ -22,9 +22,6 @@ Route::get('/', function () {
     ]);
 })->name('Home');;
 
-Route::get('/meow',function () {
-    return Inertia::render('Meow');
-})->name('meow');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');

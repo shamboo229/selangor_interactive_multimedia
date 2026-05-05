@@ -5,65 +5,29 @@ import { Head } from '@inertiajs/react';
 
 export default function Home({ auth, featuredLive, archiveVideos }) {
 
-    const liveData = featuredLive || [];
-
+    const liveData = featuredLive || {};
     const videos = archiveVideos || [];
 
     return (
         <MultimediaLayout auth={auth}>
             <Head title="Utama - Portal Multimedia Selangor" />
 
-            <div className="relative overflow-hidden bg-red-600 text-white py-3 px-4 mb-10 rounded-2xl flex items-center shadow-2xl">
-                <div className="z-10 bg-white text-red-700 text-m font-black px-3 py-1 rounded-lg mr-4 shadow-md flex-shrink-0">
+            <div className="relative overflow-hidden bg-red-600 text-white py-3 px-4 mb-8 rounded-2xl flex items-center shadow-lg">
+                <div className="z-10 bg-white text-red-700 text-xs font-black px-3 py-1 rounded-lg mr-4 shadow-sm flex-shrink-0">
                     PENGUMUMAN
                 </div>
-                <marquee className="text-m font-bold tracking-wide uppercase">
-                    • {liveData.isLive ? `${liveData.title} sedang berlangsung •` : 'Sertai komuniti multimedia Selangor •'}
+                <marquee className="text-sm font-bold tracking-wide uppercase">
+                    • {liveData.is_active ? `${liveData.title} sedang berlangsung •` : 'Sertai komuniti multimedia Selangor •'}
                     Daftar Skim Mesra Usia Emas (SMUE) di portal rasmi •
                     Pantau amaran cuaca di media sosial rasmi Kerajaan Negeri •
                 </marquee>
-                <div className="absolute -right-10 top-0 w-32 h-full bg-white/20 blur-3xl rotate-12"></div>
             </div>
 
-            <section className="mb-16">
-                <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
-                    <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                            <span className="relative flex h-3 w-3">
-                                {liveData.isLive && (
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                )}
-                                <span className={`relative inline-flex rounded-full h-3 w-3 ${liveData.isLive ? 'bg-red-600' : 'bg-slate-400'}`}></span>
-                            </span>
-                            <h2 className="text-xs font-black text-red-600 uppercase tracking-[0.3em]">
-                                {liveData.isLive ? 'Siaran Langsung' : 'Siaran Arkib'}
-                            </h2>
-                        </div>
-                        <h1 className="text-4xl font-black tracking-tighter uppercase leading-none">
-                            {liveData.isLive ? 'Paparan Utama' : 'Sorotan Pilihan'}
-                        </h1>
-                    </div>
-
-                    {liveData.isLive && (
-                        <div className="bg-slate-200 px-4 py-2 rounded-xl border border-slate-300">
-                            <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest">
-                                LIVE STREAM TIDAK AKTIF
-                            </span>
-                        </div>
-                    )}
-
-                </div>
-
-                <VideoCard
-                    title={liveData.title}
-                    category={liveData.category}
-                    description={liveData.description}
-                    isLive={liveData.isLive}
-                    videoId={liveData.videoId}
-                />
+            <section className="-mt-8 mb-16">
+                <VideoCard videoId={liveData.id || 2} />
             </section>
 
-            <section className="mt-20">
+            <section className="mt-10 px-4 md:px-8">
                 <div className="flex items-center justify-between mb-10">
                     <div className="flex items-center gap-4">
                         <div className="w-2 h-8 bg-red-600 rounded-full"></div>
@@ -81,7 +45,7 @@ export default function Home({ auth, featuredLive, archiveVideos }) {
                         <div key={video.id} className="group cursor-pointer">
                             <div className="relative aspect-video rounded-3xl overflow-hidden mb-4 shadow-xl bg-slate-200 border border-transparent group-hover:border-red-500/50 transition-all">
                                 <img
-                                    src={video.thumbnail || `https://img.youtube.com/vi/${video.videoId}/mqdefault.jpg`}
+                                    src={video.thumbnail || `https://img.youtube.com/vi/${video.stream_url}/mqdefault.jpg`}
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                                     alt={video.title}
                                 />

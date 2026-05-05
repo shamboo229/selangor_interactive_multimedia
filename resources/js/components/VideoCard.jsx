@@ -1,52 +1,75 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-export default function VideoCard({ title, category, description, isLive, videoId }) {
-    const [isOpen, setIsOpen] = useState(false);
+export default function VideoCard({ videoId }) {
+    const [stream, setStream] = useState(null);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetch(`http://127.0.0.1:8000/api/streams/${videoId}`)
+            .then(res => {
+                if (!res.ok) throw new Error('Data stream tidak dijumpai');
+                return res.json();
+            })
+            .then(data => {
+                setStream(data);
+                setLoading(false);
+            })
+            .catch(err => {
+                setError(err.message);
+                setLoading(false);
+            });
+    }, [videoId]);
+
+    if (loading || error) return null;
+
+    const ytId = stream.stream_url;
 
     return (
-        <div className="w-full bg-white dark:bg-slate-950 rounded-xl overflow-hidden shadow-lg border border-gray-200 dark:border-slate-800 flex flex-col md:flex-row mb-8 transition-colors duration-300">
-            <div className="md:w-3/5 aspect-video bg-black relative group cursor-pointer" onClick={() => setIsOpen(true)}>
-                <div className="absolute inset-0 bg-slate-900 flex items-center justify-center">
-                    <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center group-hover:scale-110 transition">
-                        <div className="w-0 h-0 border-t-[10px] border-t-transparent border-l-[15px] border-l-white border-b-[10px] border-b-transparent ml-1"></div>
-                    </div>
-                </div>
-                {isLive && (
-                    <div className="absolute top-3 left-3 bg-red-600 text-white px-2 py-0.5 rounded text-[10px] font-black uppercase">
-                        LIVE
-                    </div>
-                )}
-            </div>
+        <section className="w-full py-8 px-4 md:px-10">
+            <div className="w-full max-w-[1800px] mx-auto p-6 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl bg-white dark:bg-slate-950">
 
-            <div className="md:w-2/5 p-6 flex flex-col justify-center">
-                <span className="text-red-600 font-bold text-xs uppercase mb-1">{category}</span>
-                <h2 className="text-xl font-bold text-slate-900 dark:text-white">{title}</h2>
-                <p className="text-gray-500 dark:text-slate-400 mt-3 text-sm">{description}</p>
-            </div>
-
-            {isOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
-                    <div className="relative w-full max-w-4xl">
-                        <button
-                            onClick={() => setIsOpen(false)}
-                            className="absolute -top-12 right-0 text-white hover:text-red-500 font-black tracking-widest text-m uppercase"
-                        >
-                            TUTUP [X]
-                        </button>
-
-                        <div className="aspect-video w-full rounded-2xl overflow-hidden shadow-2xl border border-white/10">
-                            <iframe
-                                className="w-full h-full"
-                                src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
-                                title="YouTube video player"
-                                frameBorder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                allowFullScreen
-                            ></iframe>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <div className="lg:col-span-9">
+                        <div className="relative aspect-video bg-black rounded-2xl overflow-hidden shadow-lg">
+                            {isPlaying ? (
+                                <iframe
+                                    className="w-full h-full"
+                                    src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`}
+                                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                ></iframe>
+                            ) : (
+                                <div className="w-full h-full relative cursor-pointer group" onClick={() => setIsPlaying(true)}>
+                                    <img
+                                        src={`https://img.youtube.com/vi/${ytId}/maxresdefault.jpg`}
+                                        className="w-full h-full object-cover"
+                                        alt="Thumbnail"
+                                    />
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                        <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/20 group-hover:scale-110 transition">
+                                            <div className="w-0 h-0 border-t-[12px] border-t-transparent border-l-[20px] border-l-white border-b-[12px] border-b-transparent ml-1"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
+                    <div className="lg:col-span-3 flex flex-col gap-4">
+                        <span className="text-red-600 font-black text-[9px] uppercase tracking-[0.2em] bg-red-50 dark:bg-red-950/30 px-3 py-1 rounded-full w-fit">
+                            {stream.category || 'Siaran Langsung'}
+                        </span>
+                        <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase leading-tight tracking-tight">
+                            {stream.title}
+                        </h1>
+                        <p className="text-gray-600 dark:text-slate-400 text-sm leading-relaxed">
+                            {stream.description || 'Tiada deskripsi tersedia.'}
+                        </p>
+                    </div>
+
                 </div>
-            )}
-        </div>
+            </div>
+        </section>
     );
 }
