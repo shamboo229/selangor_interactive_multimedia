@@ -105,7 +105,7 @@ export default function MultimediaLayout({ children, auth }) {
                             <div className={`h-8 w-[1px] mx-2 hidden sm:block ${isAdminPath ? 'bg-slate-800' : 'bg-slate-200 dark:bg-slate-800'}`} />
 
                             {isAdminPath ? (
-                                <Link method="post" href="/" as="button" className="bg-white text-slate-900 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all shadow-lg">
+                                <Link method="post" href="/logout" as="button" className="bg-white text-slate-900 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all shadow-lg">
                                     Log Keluar
                                 </Link>
                             ) : (
