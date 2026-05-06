@@ -22,26 +22,17 @@ export default function Dashboard({ auth, currentStream, stats = {} }) {
         });
     };
 
-    // --- NEW INTERCEPTOR FUNCTION ---
     const handleUrlChange = (e) => {
         let input = e.target.value;
         let finalId = input;
-
-        // If it looks like a URL, parse out the 11-character YouTube ID
         if (input.includes('youtube.com') || input.includes('youtu.be')) {
-            // This Regex catches standard links, shorts, embeds, and mobile links
             const match = input.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/);
             if (match && match[1]) {
-                finalId = match[1]; // Grab just the ID portion
+                finalId = match[1];
             }
         }
-
-        // Set the form data to ONLY be the ID
         setData('url', finalId);
     };
-
-    // Since the input is now forced to be just the ID, we can safely pass it to the iframe directly.
-    // We still keep a tiny fallback just in case old database data has a full URL.
     const ytId = data.url?.includes('http')
         ? data.url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/) !== null
             ? data.url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/)[1]
@@ -53,15 +44,11 @@ export default function Dashboard({ auth, currentStream, stats = {} }) {
             <Head title="SIM Command Center" />
 
             <div className="min-h-screen bg-slate-50 dark:bg-[#0b0f1a] p-4 lg:p-8 text-slate-900 dark:text-white">
-
-                {/* Header */}
                 <div className="mb-10">
                     <h1 className="text-5xl font-black uppercase tracking-tighter">SIM <span className="text-red-600">DASHBOARD</span></h1>
                     <p className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.4em] mt-1">Selangor Information Management • v2.4.0</p>
                 </div>
-
                 <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-                    {/* LEFT: MASSIVE VIDEO PREVIEW */}
                     <div className="xl:col-span-9">
                         <div className="bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-2xl border-[12px] border-slate-200 dark:border-slate-800">
                             <div className="relative aspect-[21/9] w-full bg-black">
@@ -82,8 +69,6 @@ export default function Dashboard({ auth, currentStream, stats = {} }) {
                             </div>
                         </div>
                     </div>
-
-                    {/* RIGHT: STREAM ORCHESTRATOR */}
                     <div className="xl:col-span-3 space-y-6">
                         <div className="bg-white dark:bg-slate-800/40 backdrop-blur-md p-8 rounded-[2rem] shadow-xl border border-slate-200 dark:border-slate-700/50">
                             <h2 className="text-sm font-black uppercase mb-6">Stream Orchestrator</h2>
@@ -101,7 +86,7 @@ export default function Dashboard({ auth, currentStream, stats = {} }) {
                                     <label className="text-[9px] font-black uppercase text-slate-400">YouTube ID / URL</label>
                                     <input
                                         value={data.url}
-                                        onChange={handleUrlChange} // <-- CHANGED HERE
+                                        onChange={handleUrlChange}
                                         className="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-xl p-3 mt-1 font-mono outline-none focus:ring-2 focus:ring-red-500"
                                         placeholder="Paste full URL or ID"
                                     />

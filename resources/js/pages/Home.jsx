@@ -4,15 +4,10 @@ import VideoCard from '@/Components/VideoCard';
 import { Head } from '@inertiajs/react';
 
 export default function Home({ auth, featuredLive, archiveVideos }) {
-    // 1. DEBUG: Press F12 in your browser and check the Console tab to see this!
     console.log("Data direct dari Laravel:", featuredLive);
-
-    // 2. BULLETPROOFING: If Laravel sent an array (e.g. using ->get()), grab the first item.
     const actualLiveData = Array.isArray(featuredLive) ? featuredLive[0] : featuredLive;
     const liveData = actualLiveData || {};
     const videos = archiveVideos || [];
-
-    // 3. Check for ANY type of ID/URL column name your backend might be using
     const hasActiveStream = liveData.stream_url || liveData.url || liveData.stream_id || liveData.id;
 
     return (
@@ -31,7 +26,6 @@ export default function Home({ auth, featuredLive, archiveVideos }) {
             </div>
 
             <section className="-mt-8 mb-16">
-                {/* Now passing the properly extracted liveData */}
                 {hasActiveStream ? (
                     <VideoCard stream={liveData} />
                 ) : (
