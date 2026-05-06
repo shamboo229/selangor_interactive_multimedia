@@ -1,42 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
-export default function VideoCard({ videoId }) {
-    const [stream, setStream] = useState(null);
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(true);
+export default function VideoCard({ stream }) {
+    const rawId = stream?.stream_url || stream?.id;
+    if (!stream || !rawId) {
+        return (
+            <div className="p-10 text-center text-red-600 font-bold uppercase text-xs">
+                Data stream tidak dijumpai
+            </div>
+        );
+    }
 
-    useEffect(() => {
-        let isMounted = true;
-
-        fetch(`http://127.0.0.1:8000/api/streams/${videoId}`)
-            .then(res => {
-                if (!res.ok) throw new Error('Data stream tidak dijumpai');
-                return res.json();
-            })
-            .then(data => {
-                if (isMounted) {
-                    const streamData = Array.isArray(data) ? data[0] : data;
-                    setStream(streamData);
-                    setLoading(false);
-                }
-            })
-            .catch(err => {
-                if (isMounted) {
-                    setError(err.message);
-                    setLoading(false);
-                }
-            });
-
-        return () => { isMounted = false; };
-    }, [videoId]);
-
-    if (loading) return <div className="p-10 text-center text-slate-500 font-bold tracking-widest uppercase text-xs">Loading Live Stream...</div>;
-    if (error) return <div className="p-10 text-center text-red-600 font-bold uppercase text-xs">Error: {error}</div>;
-
-    // Ensure we only use the ID for the iframe embed URL
-    const ytId = stream?.stream_url?.includes('youtube.com') || stream?.stream_url?.includes('youtu.be')
-        ? stream.stream_url.split('v=')[1]?.split('&')[0] || stream.stream_url.split('/').pop()
-        : stream?.stream_url;
+    const ytId = rawId.includes('youtube.com') || rawId.includes('youtu.be')
+        ? rawId.split('v=')[1]?.split('&')[0] || rawId.split('/').pop()
+        : rawId;
 
     return (
         <section className="w-full py-8 px-4 md:px-10">
@@ -48,7 +24,6 @@ export default function VideoCard({ videoId }) {
                             {ytId ? (
                                 <iframe
                                     className="absolute top-0 left-0 w-full h-full"
-                                    // Added autoplay=1 and mute=1 so it autoplays silently
                                     src={`https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&rel=0&modestbranding=1`}
                                     title={stream.title || "YouTube video player"}
                                     frameBorder="0"
@@ -68,7 +43,7 @@ export default function VideoCard({ videoId }) {
                             {stream.category || 'SIARAN LANGSUNG'}
                         </span>
                         <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase leading-tight">
-                            {stream.title || 'No Title'}
+                            {stream.title || 'Tiada Tajuk'}
                         </h1>
                         <p className="text-gray-600 dark:text-slate-400 text-sm leading-relaxed">
                             {stream.description || 'Tiada deskripsi tersedia.'}

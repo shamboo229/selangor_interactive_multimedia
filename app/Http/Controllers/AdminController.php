@@ -12,13 +12,12 @@ class AdminController extends Controller
 {
     public function Dashboard()
     {
-        // Fetch only the currently active stream
         $activeStream = Stream::where('is_active', true)->first();
 
         return Inertia::render('Admin/Dashboard', [
             'currentStream' => [
-                'title' => '',
-                'url'   =>  '',
+                'title' => $activeStream->title ?? '',
+                'url'   => $activeStream->stream_url ?? '',
             ],
             'stats' => [
                 'active_users' => 0,

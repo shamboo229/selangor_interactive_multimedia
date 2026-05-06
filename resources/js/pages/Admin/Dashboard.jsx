@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import MultimediaLayout from '@/Layouts/MultimediaLayout';
 import { Head, useForm } from '@inertiajs/react';
-import ReactPlayer from 'react-player';
 
 export default function Dashboard({ auth, currentStream, stats = {} }) {
     const { data, setData, post, processing } = useForm({
@@ -23,6 +22,32 @@ export default function Dashboard({ auth, currentStream, stats = {} }) {
         });
     };
 
+    // --- NEW INTERCEPTOR FUNCTION ---
+    const handleUrlChange = (e) => {
+        let input = e.target.value;
+        let finalId = input;
+
+        // If it looks like a URL, parse out the 11-character YouTube ID
+        if (input.includes('youtube.com') || input.includes('youtu.be')) {
+            // This Regex catches standard links, shorts, embeds, and mobile links
+            const match = input.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/);
+            if (match && match[1]) {
+                finalId = match[1]; // Grab just the ID portion
+            }
+        }
+
+        // Set the form data to ONLY be the ID
+        setData('url', finalId);
+    };
+
+    // Since the input is now forced to be just the ID, we can safely pass it to the iframe directly.
+    // We still keep a tiny fallback just in case old database data has a full URL.
+    const ytId = data.url?.includes('http')
+        ? data.url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/) !== null
+            ? data.url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/)[1]
+            : data.url
+        : data.url;
+
     return (
         <MultimediaLayout auth={auth}>
             <Head title="SIM Command Center" />
@@ -36,19 +61,24 @@ export default function Dashboard({ auth, currentStream, stats = {} }) {
                 </div>
 
                 <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-                    {/* LEFT: MASSIVE VIDEO PREVIEW (Matches Homepage) */}
+                    {/* LEFT: MASSIVE VIDEO PREVIEW */}
                     <div className="xl:col-span-9">
                         <div className="bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-2xl border-[12px] border-slate-200 dark:border-slate-800">
                             <div className="relative aspect-[21/9] w-full bg-black">
-                                <ReactPlayer
-                                    key={data.url}
-                                    url={`https://www.youtube.com/watch?v=${data.url}`}
-                                    width="100%"
-                                    height="100%"
-                                    controls={true}
-                                    playing={true}
-                                    muted={true}
-                                />
+                                {ytId && ytId.length === 11 ? (
+                                    <iframe
+                                        className="absolute top-0 left-0 w-full h-full"
+                                        src={`https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&rel=0&modestbranding=1`}
+                                        title="Dashboard Preview"
+                                        frameBorder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowFullScreen
+                                    ></iframe>
+                                ) : (
+                                    <div className="flex items-center justify-center w-full h-full text-slate-500 font-bold uppercase tracking-widest text-xs">
+                                        Waiting for valid YouTube ID...
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -63,23 +93,23 @@ export default function Dashboard({ auth, currentStream, stats = {} }) {
                                     <input
                                         value={data.title}
                                         onChange={e => setData('title', e.target.value)}
-                                        className="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-xl p-3 mt-1 outline-none"
+                                        className="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-xl p-3 mt-1 outline-none focus:ring-2 focus:ring-red-500"
                                         placeholder="Enter title..."
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-[9px] font-black uppercase text-slate-400">YouTube ID</label>
+                                    <label className="text-[9px] font-black uppercase text-slate-400">YouTube ID / URL</label>
                                     <input
                                         value={data.url}
-                                        onChange={e => setData('url', e.target.value)}
-                                        className="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-xl p-3 mt-1 font-mono outline-none"
-                                        placeholder="e.g. dQw4w9WgXcQ"
+                                        onChange={handleUrlChange} // <-- CHANGED HERE
+                                        className="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-xl p-3 mt-1 font-mono outline-none focus:ring-2 focus:ring-red-500"
+                                        placeholder="Paste full URL or ID"
                                     />
                                 </div>
                                 <button
                                     type="submit"
-                                    disabled={processing}
-                                    className="w-full bg-red-600 hover:bg-red-700 text-white font-black py-4 rounded-xl uppercase tracking-widest text-xs transition-all"
+                                    disabled={processing || (data.url && data.url.length !== 11)}
+                                    className="w-full bg-red-600 hover:bg-red-700 disabled:bg-red-900/50 text-white font-black py-4 rounded-xl uppercase tracking-widest text-xs transition-all"
                                 >
                                     {processing ? 'DEPLOYING...' : 'DEPLOY TO PORTAL'}
                                 </button>

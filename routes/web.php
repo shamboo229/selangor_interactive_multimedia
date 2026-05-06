@@ -8,15 +8,15 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    $stream = Stream::where('is_active', true)->first();
+    $stream = Stream::where('is_active', true)->latest()->first();
 
     return Inertia::render('Home', [
         'featuredLive' => [
+            'id'          => $stream->stream_url ?? null,
             'title'       => $stream->title ?? 'Tiada Siaran Aktif',
+            'is_active'   => $stream ? true : false,
             'category'    => 'LIVE',
             'description' => 'Selamat datang ke portal multimedia Selangor',
-            'isLive'      => (bool)$stream,
-            'videoId'     => $stream->stream_url ?? '',
         ],
         'archiveVideos' => Stream::where('is_active', false)->latest()->get(),
     ]);
