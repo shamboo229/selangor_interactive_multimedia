@@ -25,6 +25,7 @@ export default function Home({ auth, featuredLive, archiveVideos }) {
                 </marquee>
             </div>
 
+            {/* --- 1. MAIN LIVE STAGE --- */}
             <section className="-mt-8 mb-16">
                 {hasActiveStream ? (
                     <VideoCard stream={liveData} />
@@ -39,6 +40,87 @@ export default function Home({ auth, featuredLive, archiveVideos }) {
                 )}
             </section>
 
+            {/* --- 2. BERITA & INFO SEMASA SECTION --- */}
+            <section className="mt-12 mb-16 px-4 md:px-8 max-w-[1800px] mx-auto">
+                <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center gap-4">
+                        <div className="w-2 h-8 bg-blue-600 dark:bg-blue-500 rounded-full"></div>
+                        <h3 className="text-2xl font-black uppercase tracking-tight text-slate-900 dark:text-white">
+                            Berita & Info Semasa
+                        </h3>
+                    </div>
+                    <button className="group text-[11px] font-black text-blue-600 dark:text-blue-500 uppercase tracking-widest flex items-center gap-2 hover:gap-3 transition-all">
+                        Semua Berita <span className="text-lg">→</span>
+                    </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {/* Fake News Card 1 */}
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-lg border border-slate-100 dark:border-slate-800 hover:shadow-xl transition-shadow group cursor-pointer flex flex-col">
+                        <div className="aspect-[16/10] bg-slate-200 dark:bg-slate-800 overflow-hidden relative">
+                            <img
+                                src="https://images.unsplash.com/photo-1577493341514-fc59bd825310?q=80&w=800&auto=format&fit=crop"
+                                alt="Dewan Negeri"
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                            <div className="absolute top-4 left-4 bg-red-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-md">
+                                Terkini
+                            </div>
+                        </div>
+                        <div className="p-6 flex flex-col flex-grow">
+                            <span className="text-slate-400 text-xs font-bold mb-2 uppercase tracking-wider">6 Mei 2026</span>
+                            <h4 className="text-lg font-bold text-slate-900 dark:text-white leading-snug mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                Sidang Dewan Negeri Selangor Penggal Ke-15 Bermula Hari Ini
+                            </h4>
+                            <p className="text-slate-500 dark:text-slate-400 text-sm line-clamp-2 mt-auto">
+                                Ikuti liputan penuh perbahasan rang undang-undang dan inisiatif terbaru kerajaan negeri untuk kesejahteraan rakyat.
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Fake News Card 2 */}
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-lg border border-slate-100 dark:border-slate-800 hover:shadow-xl transition-shadow group cursor-pointer flex flex-col">
+                        <div className="aspect-[16/10] bg-slate-200 dark:bg-slate-800 overflow-hidden relative">
+                            <img
+                                src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=800&auto=format&fit=crop"
+                                alt="Mesyuarat"
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                        </div>
+                        <div className="p-6 flex flex-col flex-grow">
+                            <span className="text-slate-400 text-xs font-bold mb-2 uppercase tracking-wider">5 Mei 2026</span>
+                            <h4 className="text-lg font-bold text-slate-900 dark:text-white leading-snug mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                Pendaftaran Skim Mesra Usia Emas (SMUE) Kini Dibuka
+                            </h4>
+                            <p className="text-slate-500 dark:text-slate-400 text-sm line-clamp-2 mt-auto">
+                                Warga emas dijemput mendaftar secara dalam talian untuk menikmati manfaat baucar beli-belah tahunan.
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Fake News Card 3 */}
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-lg border border-slate-100 dark:border-slate-800 hover:shadow-xl transition-shadow group cursor-pointer flex flex-col hidden lg:flex">
+                        <div className="aspect-[16/10] bg-slate-200 dark:bg-slate-800 overflow-hidden relative">
+                            <img
+                                src="https://images.unsplash.com/photo-1605806616949-1e87b487cb2a?q=80&w=800&auto=format&fit=crop"
+                                alt="Media"
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                        </div>
+                        <div className="p-6 flex flex-col flex-grow">
+                            <span className="text-slate-400 text-xs font-bold mb-2 uppercase tracking-wider">4 Mei 2026</span>
+                            <h4 className="text-lg font-bold text-slate-900 dark:text-white leading-snug mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                Portal Multimedia Selangor Dinaik Taraf Ke Versi Baharu
+                            </h4>
+                            <p className="text-slate-500 dark:text-slate-400 text-sm line-clamp-2 mt-auto">
+                                Saksikan pengalaman penstriman yang lebih lancar dan mesra pengguna menerusi platform terkini kami.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* --- 3. ARCHIVES SECTION --- */}
             <section className="mt-10 px-4 md:px-8">
                 <div className="flex items-center justify-between mb-10">
                     <div className="flex items-center gap-4">
