@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import MultimediaLayout from '@/Layouts/MultimediaLayout';
 import { Head, useForm } from '@inertiajs/react';
+import AdminLayout from '@/Layouts/AdminLayout';
 
 export default function Dashboard({ auth, currentStream, stats = {} }) {
     const { data, setData, post, processing } = useForm({
@@ -33,6 +33,8 @@ export default function Dashboard({ auth, currentStream, stats = {} }) {
         }
         setData('url', finalId);
     };
+
+    // Safe extraction of YouTube ID
     const ytId = data.url?.includes('http')
         ? data.url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/) !== null
             ? data.url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/)[1]
@@ -40,69 +42,104 @@ export default function Dashboard({ auth, currentStream, stats = {} }) {
         : data.url;
 
     return (
-        <MultimediaLayout auth={auth}>
-            <Head title="SIM Command Center" />
+        <AdminLayout auth={auth}>
+            <Head title="Dashboard - SIM Workspace" />
 
-            <div className="min-h-screen bg-slate-50 dark:bg-[#0b0f1a] p-4 lg:p-8 text-slate-900 dark:text-white">
-                <div className="mb-10">
-                    <h1 className="text-5xl font-black uppercase tracking-tighter">SIM <span className="text-red-600">DASHBOARD</span></h1>
-                    <p className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.4em] mt-1">Selangor Information Management • v2.4.0</p>
-                </div>
-                <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-                    <div className="xl:col-span-9">
-                        <div className="bg-slate-900 rounded-[2.5rem] overflow-hidden shadow-2xl border-[12px] border-slate-200 dark:border-slate-800">
-                            <div className="relative aspect-[21/9] w-full bg-black">
-                                {ytId && ytId.length === 11 ? (
-                                    <iframe
-                                        className="absolute top-0 left-0 w-full h-full"
-                                        src={`https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&rel=0&modestbranding=1`}
-                                        title="Dashboard Preview"
-                                        frameBorder="0"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                        allowFullScreen
-                                    ></iframe>
-                                ) : (
-                                    <div className="flex items-center justify-center w-full h-full text-slate-500 font-bold uppercase tracking-widest text-xs">
-                                        Waiting for valid YouTube ID...
-                                    </div>
-                                )}
+            <div className="max-w-7xl mx-auto space-y-8">
+                <h1 className="text-2xl font-bold text-slate-800 tracking-tight">System Overview</h1>
+
+                {/* Stats Row */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Stat Cards (Same as previous design) */}
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <h3 className="text-slate-500 text-sm font-medium">Total Articles</h3>
+                                <p className="text-3xl font-bold text-slate-800 mt-2">{stats.articles || 124}</p>
+                            </div>
+                            <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
                             </div>
                         </div>
                     </div>
-                    <div className="xl:col-span-3 space-y-6">
-                        <div className="bg-white dark:bg-slate-800/40 backdrop-blur-md p-8 rounded-[2rem] shadow-xl border border-slate-200 dark:border-slate-700/50">
-                            <h2 className="text-sm font-black uppercase mb-6">Stream Orchestrator</h2>
-                            <form onSubmit={submitLiveUpdate} className="space-y-4">
-                                <div>
-                                    <label className="text-[9px] font-black uppercase text-slate-400">Broadcast Title</label>
-                                    <input
-                                        value={data.title}
-                                        onChange={e => setData('title', e.target.value)}
-                                        className="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-xl p-3 mt-1 outline-none focus:ring-2 focus:ring-red-500"
-                                        placeholder="Enter title..."
-                                    />
+                    {/* Add other stats cards here as needed */}
+                </div>
+
+                {/* Stream Orchestrator Section */}
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+
+                    {/* Video Preview Column */}
+                    <div className="xl:col-span-2">
+                        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden h-full flex flex-col">
+                            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+                                <h2 className="text-base font-bold text-slate-800">Stream Output Preview</h2>
+                                <span className="bg-slate-100 text-slate-500 text-xs px-3 py-1 rounded-full font-semibold">Live Module</span>
+                            </div>
+                            <div className="p-6 flex-1 flex flex-col justify-center bg-slate-50/50">
+                                <div className="relative aspect-[16/9] w-full bg-[#0b1121] rounded-xl overflow-hidden shadow-inner ring-1 ring-slate-900/5">
+                                    {ytId && ytId.length === 11 ? (
+                                        <iframe
+                                            className="absolute top-0 left-0 w-full h-full"
+                                            src={`https://www.youtube.com/embed/${ytId}?=1&mute=1&rel=0&modestbranding=1`}
+                                            title="Dashboard Preview"
+                                            frameBorder="0"
+                                            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                            allowFullScreen
+                                        ></iframe>
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center w-full h-full text-slate-500">
+                                            <svg className="w-12 h-12 mb-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                            <p className="font-medium text-sm">No valid broadcast source detected</p>
+                                        </div>
+                                    )}
                                 </div>
-                                <div>
-                                    <label className="text-[9px] font-black uppercase text-slate-400">YouTube ID / URL</label>
-                                    <input
-                                        value={data.url}
-                                        onChange={handleUrlChange}
-                                        className="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-xl p-3 mt-1 font-mono outline-none focus:ring-2 focus:ring-red-500"
-                                        placeholder="Paste full URL or ID"
-                                    />
-                                </div>
-                                <button
-                                    type="submit"
-                                    disabled={processing || (data.url && data.url.length !== 11)}
-                                    className="w-full bg-red-600 hover:bg-red-700 disabled:bg-red-900/50 text-white font-black py-4 rounded-xl uppercase tracking-widest text-xs transition-all"
-                                >
-                                    {processing ? 'DEPLOYING...' : 'DEPLOY TO PORTAL'}
-                                </button>
-                            </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Orchestrator Form Column */}
+                    <div className="xl:col-span-1">
+                        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 h-full flex flex-col">
+                            <div className="px-6 py-5 border-b border-slate-100">
+                                <h2 className="text-base font-bold text-slate-800">Orchestration Settings</h2>
+                            </div>
+                            <div className="p-6 flex-1">
+                                <form onSubmit={submitLiveUpdate} className="space-y-6">
+                                    <div>
+                                        <label className="block text-sm font-semibold text-slate-700 mb-2">Broadcast Title</label>
+                                        <input
+                                            value={data.title || ''}
+                                            onChange={e => setData('title', e.target.value)}
+                                            className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-4 focus:ring-red-500/10 focus:border-red-500 block p-3.5 outline-none"
+                                            placeholder="e.g., Sidang DUN Selangor Live"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-semibold text-slate-700 mb-2">YouTube URL or ID</label>
+                                        <input
+                                            value={data.url || ''}
+                                            onChange={handleUrlChange}
+                                            className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-4 focus:ring-red-500/10 focus:border-red-500 block p-3.5 font-mono outline-none"
+                                            placeholder="https://youtube.com/watch?v=..."
+                                        />
+                                    </div>
+
+                                    <div className="pt-4">
+                                        <button
+                                            type="submit"
+                                            disabled={processing || (data.url && data.url.length !== 11)}
+                                            className="w-full text-white bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 disabled:from-slate-300 disabled:to-slate-300 font-bold rounded-xl text-sm px-5 py-4 transition-all flex justify-center items-center gap-2"
+                                        >
+                                            {processing ? 'Deploying Update...' : 'Update Live Module'}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </MultimediaLayout>
+        </AdminLayout>
     );
 }

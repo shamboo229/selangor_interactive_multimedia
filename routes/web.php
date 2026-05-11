@@ -3,6 +3,8 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\NewsController;
+use App\Http\Controllers\AssetController;
 use App\Models\Stream;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -30,10 +32,10 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/admin', [AdminController::class, 'Dashboard'])->name('dashboard');
-
+    Route::get('/admin/news', [NewsController::class, 'index'])->name('admin.news.index');
+    Route::get('/admin/assets', [AssetController::class, 'index'])->name('admin.assets.index');
     Route::post('/admin/update-stream', [AdminController::class, 'updateStream'])
         ->name('admin.stream.update');
-
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

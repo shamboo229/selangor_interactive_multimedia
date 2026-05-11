@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\Asset;
+use App\Models\News;
 
-class AssetController extends Controller
+class NewsController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Admin/MediaLibrary');
+        return Inertia::render('Admin/NewsIndex');
     }
 }
