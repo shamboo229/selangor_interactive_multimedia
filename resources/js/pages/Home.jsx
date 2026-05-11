@@ -39,8 +39,6 @@ export default function Home({ auth, featuredLive, archiveVideos }) {
                     </div>
                 )}
             </section>
-
-            {/* --- 2. BERITA & INFO SEMASA SECTION --- */}
             <section className="mt-12 mb-16 px-4 md:px-8 max-w-[1800px] mx-auto">
                 <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center gap-4">
@@ -55,7 +53,6 @@ export default function Home({ auth, featuredLive, archiveVideos }) {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {/* Fake News Card 1 */}
                     <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-lg border border-slate-100 dark:border-slate-800 hover:shadow-xl transition-shadow group cursor-pointer flex flex-col">
                         <div className="aspect-[16/10] bg-slate-200 dark:bg-slate-800 overflow-hidden relative">
                             <img
@@ -63,9 +60,6 @@ export default function Home({ auth, featuredLive, archiveVideos }) {
                                 alt="Dewan Negeri"
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             />
-                            <div className="absolute top-4 left-4 bg-red-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-md">
-                                Terkini
-                            </div>
                         </div>
                         <div className="p-6 flex flex-col flex-grow">
                             <span className="text-slate-400 text-xs font-bold mb-2 uppercase tracking-wider">6 Mei 2026</span>
@@ -77,8 +71,6 @@ export default function Home({ auth, featuredLive, archiveVideos }) {
                             </p>
                         </div>
                     </div>
-
-                    {/* Fake News Card 2 */}
                     <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-lg border border-slate-100 dark:border-slate-800 hover:shadow-xl transition-shadow group cursor-pointer flex flex-col">
                         <div className="aspect-[16/10] bg-slate-200 dark:bg-slate-800 overflow-hidden relative">
                             <img
@@ -97,8 +89,6 @@ export default function Home({ auth, featuredLive, archiveVideos }) {
                             </p>
                         </div>
                     </div>
-
-                    {/* Fake News Card 3 */}
                     <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-lg border border-slate-100 dark:border-slate-800 hover:shadow-xl transition-shadow group cursor-pointer flex flex-col hidden lg:flex">
                         <div className="aspect-[16/10] bg-slate-200 dark:bg-slate-800 overflow-hidden relative">
                             <img
@@ -119,8 +109,6 @@ export default function Home({ auth, featuredLive, archiveVideos }) {
                     </div>
                 </div>
             </section>
-
-            {/* --- 3. ARCHIVES SECTION --- */}
             <section className="mt-10 px-4 md:px-8">
                 <div className="flex items-center justify-between mb-10">
                     <div className="flex items-center gap-4">

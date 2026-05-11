@@ -3,7 +3,6 @@ import { Link, usePage } from '@inertiajs/react';
 
 export default function MultimediaLayout({ children, auth }) {
     const { url } = usePage();
-    // Initialize state from localStorage
     const [darkMode, setDarkMode] = useState(() => {
         return localStorage.getItem('theme') === 'dark';
     });
@@ -23,13 +22,10 @@ export default function MultimediaLayout({ children, auth }) {
     }, [darkMode]);
 
     return (
-        /* Added dark:bg-slate-950 and dark:text-white to the main wrapper */
         <div className={`min-h-screen transition-colors duration-300 font-sans
             ${isAdminPath
                 ? 'bg-slate-950 text-white'
                 : 'bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100'}`}>
-
-            {/* TOP UTILITY BAR */}
             <div className={`hidden sm:flex py-2 px-6 text-[10px] justify-between items-center tracking-[0.2em] font-black uppercase
                 ${isAdminPath
                     ? 'bg-red-700 text-white border-b border-red-800'
@@ -42,16 +38,12 @@ export default function MultimediaLayout({ children, auth }) {
                     <span className="opacity-60">{new Date().toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                 </div>
             </div>
-
-            {/* MAIN NAVIGATION */}
             <nav className={`sticky top-0 z-50 shadow-sm border-b transition-colors duration-300
                 ${isAdminPath
                     ? 'bg-slate-900 border-slate-800'
                     : 'bg-white/80 backdrop-blur-xl border-slate-200 dark:bg-slate-900/80 dark:border-slate-800'}`}>
                 <div className={`${isAdminPath ? 'max-w-[1600px]' : 'max-w-7xl'} mx-auto px-4 sm:px-6`}>
                     <div className="flex justify-between h-20">
-
-                        {/* LEFT: Logo */}
                         <div className="flex items-center">
                             <Link href={isAdminPath ? "/admin" : "/"} className="flex items-center gap-3 group">
                                 <div className={`${isAdminPath ? 'bg-red-600' : 'bg-slate-900 dark:bg-red-600'} w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:rotate-6`}>
@@ -67,8 +59,6 @@ export default function MultimediaLayout({ children, auth }) {
                                 </div>
                             </Link>
                         </div>
-
-                        {/* CENTER: Navigation */}
                         <div className="hidden lg:flex items-center space-x-1">
                             {isAdminPath ? (
                                 <>
@@ -89,8 +79,6 @@ export default function MultimediaLayout({ children, auth }) {
                                 </>
                             )}
                         </div>
-
-                        {/* RIGHT: Tools */}
                         <div className="flex items-center gap-3">
                             <button
                                 onClick={() => setDarkMode(!darkMode)}
@@ -113,8 +101,6 @@ export default function MultimediaLayout({ children, auth }) {
                                     Akses Pentadbir
                                 </Link>
                             )}
-
-                            {/* Mobile Toggle */}
                             <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="lg:hidden p-2 dark:text-white">
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16m-7 6h7"} />
@@ -124,7 +110,6 @@ export default function MultimediaLayout({ children, auth }) {
                     </div>
                 </div>
 
-                {/* MOBILE MENU */}
                 {isMenuOpen && (
                     <div className="lg:hidden bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 p-6 space-y-4">
                         <div className="grid grid-cols-1 gap-2">
@@ -145,13 +130,9 @@ export default function MultimediaLayout({ children, auth }) {
                     </div>
                 )}
             </nav>
-
-            {/* MAIN CONTENT AREA */}
             <main className={`${isAdminPath ? 'max-w-[1600px]' : 'max-w-7xl'} mx-auto px-4 sm:px-6 lg:px-8 py-8`}>
                 {children}
             </main>
-
-            {/* CONDITIONAL FOOTER */}
             {!isAdminPath && (
                 <footer className="border-t border-slate-200 dark:border-slate-800 py-12 mt-12 bg-white dark:bg-slate-950">
                     <div className="max-w-7xl mx-auto px-6 text-center">
