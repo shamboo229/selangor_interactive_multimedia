@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Head, useForm } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
+import ReactPlayer from 'react-player'; // Added this import
 
 export default function Dashboard({ auth, currentStream, stats = {} }) {
     const { data, setData, post, processing } = useForm({
@@ -22,24 +23,35 @@ export default function Dashboard({ auth, currentStream, stats = {} }) {
         });
     };
 
+    // Updated to accept both YT URLs and .m3u8 URLs safely
     const handleUrlChange = (e) => {
         let input = e.target.value;
-        let finalId = input;
+
+        // If it's a YouTube link, extract just the 11-character ID
         if (input.includes('youtube.com') || input.includes('youtu.be')) {
             const match = input.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/);
             if (match && match[1]) {
-                finalId = match[1];
+                setData('url', match[1]);
+                return;
             }
         }
-        setData('url', finalId);
+
+        // Otherwise (like an .m3u8 link), save the raw input
+        setData('url', input);
     };
 
-    // Safe extraction of YouTube ID
-    const ytId = data.url?.includes('http')
-        ? data.url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/) !== null
-            ? data.url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/)[1]
-            : data.url
-        : data.url;
+    // Helper to figure out what URL to feed the preview player
+    const getPlaybackUrl = (urlStr) => {
+        if (!urlStr) return null;
+        // If it's exactly 11 chars with no dots, it's likely a YT ID
+        if (urlStr.length === 11 && !urlStr.includes('.')) {
+            return `https://www.youtube.com/watch?v=${urlStr}`;
+        }
+        // Otherwise, it's our direct stream URL
+        return urlStr;
+    };
+
+    const playbackUrl = getPlaybackUrl(data.url);
 
     return (
         <AdminLayout auth={auth}>
@@ -50,7 +62,6 @@ export default function Dashboard({ auth, currentStream, stats = {} }) {
 
                 {/* Stats Row */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Stat Cards (Same as previous design) */}
                     <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                         <div className="flex justify-between items-start">
                             <div>
@@ -62,12 +73,10 @@ export default function Dashboard({ auth, currentStream, stats = {} }) {
                             </div>
                         </div>
                     </div>
-                    {/* Add other stats cards here as needed */}
                 </div>
 
                 {/* Stream Orchestrator Section */}
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-
                     {/* Video Preview Column */}
                     <div className="xl:col-span-2">
                         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden h-full flex flex-col">
@@ -77,15 +86,16 @@ export default function Dashboard({ auth, currentStream, stats = {} }) {
                             </div>
                             <div className="p-6 flex-1 flex flex-col justify-center bg-slate-50/50">
                                 <div className="relative aspect-[16/9] w-full bg-[#0b1121] rounded-xl overflow-hidden shadow-inner ring-1 ring-slate-900/5">
-                                    {ytId && ytId.length === 11 ? (
-                                        <iframe
-                                            className="absolute top-0 left-0 w-full h-full"
-                                            src={`https://www.youtube.com/embed/${ytId}?=1&mute=1&rel=0&modestbranding=1`}
-                                            title="Dashboard Preview"
-                                            frameBorder="0"
-                                            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                            allowFullScreen
-                                        ></iframe>
+                                    {playbackUrl ? (
+                                        <ReactPlayer
+                                            className="absolute top-0 left-0"
+                                            url={playbackUrl}
+                                            width="100%"
+                                            height="100%"
+                                            controls={true}
+                                            playing={true}
+                                            muted={true}
+                                        />
                                     ) : (
                                         <div className="flex flex-col items-center justify-center w-full h-full text-slate-500">
                                             <svg className="w-12 h-12 mb-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
@@ -111,24 +121,25 @@ export default function Dashboard({ auth, currentStream, stats = {} }) {
                                             value={data.title || ''}
                                             onChange={e => setData('title', e.target.value)}
                                             className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-4 focus:ring-red-500/10 focus:border-red-500 block p-3.5 outline-none"
-                                            placeholder="e.g., Sidang DUN Selangor Live"
+                                            placeholder="e.g., Sidang DUN Live"
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-semibold text-slate-700 mb-2">YouTube URL or ID</label>
+                                        <label className="block text-sm font-semibold text-slate-700 mb-2">Stream URL or YouTube ID</label>
                                         <input
                                             value={data.url || ''}
                                             onChange={handleUrlChange}
                                             className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-4 focus:ring-red-500/10 focus:border-red-500 block p-3.5 font-mono outline-none"
-                                            placeholder="https://youtube.com/watch?v=..."
+                                            placeholder="http://.../mystream.m3u8 or YouTube URL"
                                         />
                                     </div>
 
                                     <div className="pt-4">
+                                        {/* Removed the strict 11-character disable rule */}
                                         <button
                                             type="submit"
-                                            disabled={processing || (data.url && data.url.length !== 11)}
+                                            disabled={processing || !data.url}
                                             className="w-full text-white bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 disabled:from-slate-300 disabled:to-slate-300 font-bold rounded-xl text-sm px-5 py-4 transition-all flex justify-center items-center gap-2"
                                         >
                                             {processing ? 'Deploying Update...' : 'Update Live Module'}
