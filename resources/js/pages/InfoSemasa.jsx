@@ -17,13 +17,13 @@ export default function InfoSemasa() {
                 </header>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div className="h-64 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-400 font-bold tracking-widest text-sm uppercase">
-                        Berita 1
+                        Berita 1, ye ke
                     </div>
                     <div className="h-64 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-400 font-bold tracking-widest text-sm uppercase">
-                        Berita 2
+                        Berita 2, rasanya
                     </div>
                     <div className="h-64 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-400 font-bold tracking-widest text-sm uppercase">
-                        Berita 3
+                        Berita 3, kot 
                     </div>
                 </div>
             </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Hls from 'hls.js'; // Make sure this is imported!
+import Hls from 'hls.js';
 
 export default function VideoCard({ stream }) {
     const videoRef = useRef(null);
@@ -16,7 +16,6 @@ export default function VideoCard({ stream }) {
         }
     }, [rawUrl, isHlsStream]);
 
-    // THE MAGIC HLS ENGINE
     useEffect(() => {
         if (!finalUrl || !isHlsStream || !videoRef.current) return;
 
@@ -25,7 +24,7 @@ export default function VideoCard({ stream }) {
         if (Hls.isSupported()) {
             console.log("Initializing raw HLS.js...");
             hls = new Hls({
-                debug: true, // This will print EVERYTHING to the console!
+                debug: true,
                 enableWorker: true,
                 lowLatencyMode: true,
             });
@@ -57,7 +56,6 @@ export default function VideoCard({ stream }) {
                 }
             });
         } else if (videoRef.current.canPlayType('application/vnd.apple.mpegurl')) {
-            // Fallback for Safari/Mac
             videoRef.current.src = finalUrl;
         }
 
@@ -106,8 +104,6 @@ export default function VideoCard({ stream }) {
 
                         </div>
                     </div>
-
-                    {/* Right side info... */}
                     <div className="lg:col-span-3 flex flex-col gap-4">
                         <span className="text-red-600 font-black text-[9px] uppercase tracking-[0.2em] bg-red-50 px-3 py-1 rounded-full w-fit">
                             {stream.category || 'LIVE'}
