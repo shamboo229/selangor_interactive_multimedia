@@ -24,6 +24,18 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
+Route::get('/berita', function () {
+    return Inertia::render('InfoSemasa');
+})->name('berita');
+
+Route::get('/karya', function () {
+    return Inertia::render('KaryaKreatif');
+})->name('karya');
+
+Route::get('/arkib', function () {
+    return Inertia::render('ArkibDigital');
+})->name('arkib');
+
 Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 

@@ -3,15 +3,11 @@ import { Link, usePage } from '@inertiajs/react';
 
 export default function AdminLayout({ auth, children }) {
     const { url } = usePage();
-
-    // Safely check if url exists before calling startsWith
     const currentUrl = url || '';
     const checkActive = (path) => currentUrl.startsWith(path);
 
     return (
         <div className="min-h-screen bg-slate-50 flex font-sans text-slate-900 selection:bg-red-500 selection:text-white">
-
-            {/* SIDEBAR - Keep the dark aesthetic for the sidebar as originally designed */}
             <aside className="w-[280px] bg-[#0b1121] text-slate-400 flex flex-col border-r border-slate-800 hidden lg:flex">
                 <div className="h-20 flex items-center px-8 border-b border-slate-800/60 shrink-0">
                     <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-red-700 rounded-lg flex items-center justify-center mr-3 shadow-lg shadow-red-500/20">
@@ -62,22 +58,14 @@ export default function AdminLayout({ auth, children }) {
                     <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">SIM v2.4.0</p>
                 </div>
             </aside>
-
-            {/* MAIN CONTENT AREA */}
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden h-screen">
-
-                {/* TOP HEADER */}
                 <header className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-end px-8 z-10 shrink-0">
                     <div className="flex items-center gap-4 sm:gap-6">
-
-                        {/* Notification Bell */}
                         <button className="relative p-2 text-slate-400 hover:text-slate-600 transition-colors rounded-full hover:bg-slate-100">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 border-2 border-white rounded-full"></span>
                         </button>
-
                         <div className="h-8 w-px bg-slate-200"></div>
-
                         <div className="flex items-center gap-3">
                             <div className="flex flex-col items-end">
                                 <span className="text-sm font-bold text-slate-800 leading-tight">
@@ -93,8 +81,6 @@ export default function AdminLayout({ auth, children }) {
                         </div>
                     </div>
                 </header>
-
-                {/* DYNAMIC PAGE CONTENT */}
                 <main className="flex-1 overflow-y-auto p-8 bg-slate-50">
                     {children}
                 </main>

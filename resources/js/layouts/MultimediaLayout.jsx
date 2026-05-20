@@ -51,9 +51,9 @@ export default function MultimediaLayout({ children }) {
                         </div>
                         <div className="hidden lg:flex items-center space-x-1">
                             <NavLink href="/" active={url === '/'}>Live</NavLink>
+                            <NavLink href="/berita" active={url === '/berita'}>Info Semasa</NavLink>
                             <NavLink href="/karya" active={url === '/karya'}>Karya Kreatif</NavLink>
                             <NavLink href="/arkib" active={url === '/arkib'}>Arkib Digital</NavLink>
-                            <NavLink href="/berita" active={url === '/berita'}>Info Semasa</NavLink>
                         </div>
                         <div className="flex items-center gap-3">
                             <button
@@ -80,9 +80,9 @@ export default function MultimediaLayout({ children }) {
                     <div className="lg:hidden bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 p-6 space-y-4">
                         <div className="grid grid-cols-1 gap-2">
                             <MobileNavLink href="/">Utama</MobileNavLink>
+                            <MobileNavLink href="/berita">Info Semasa</MobileNavLink>
                             <MobileNavLink href="/karya">Karya Kreatif</MobileNavLink>
                             <MobileNavLink href="/arkib">Arkib Digital</MobileNavLink>
-                            <MobileNavLink href="/berita">Info Semasa</MobileNavLink>
                             <MobileNavLink href="/login">Pentadbir</MobileNavLink>
                         </div>
                     </div>
