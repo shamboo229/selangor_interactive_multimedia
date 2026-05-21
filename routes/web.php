@@ -33,7 +33,9 @@ Route::get('/karya', function () {
 })->name('karya');
 
 Route::get('/arkib', function () {
-    return Inertia::render('ArkibDigital');
+    return Inertia::render('ArkibDigital', [
+        'archiveVideos' => Stream::where('is_active', false)->latest()->get(),
+    ]);
 })->name('arkib');
 
 Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
