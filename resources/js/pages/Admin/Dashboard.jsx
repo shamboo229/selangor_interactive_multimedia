@@ -23,11 +23,8 @@ export default function Dashboard({ auth, currentStream, stats = {} }) {
         });
     };
 
-    // Updated to accept both YT URLs and .m3u8 URLs safely
     const handleUrlChange = (e) => {
         let input = e.target.value;
-
-        // If it's a YouTube link, extract just the 11-character ID
         if (input.includes('youtube.com') || input.includes('youtu.be')) {
             const match = input.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/);
             if (match && match[1]) {
@@ -35,19 +32,14 @@ export default function Dashboard({ auth, currentStream, stats = {} }) {
                 return;
             }
         }
-
-        // Otherwise (like an .m3u8 link), save the raw input
         setData('url', input);
     };
 
-    // Helper to figure out what URL to feed the preview player
     const getPlaybackUrl = (urlStr) => {
         if (!urlStr) return null;
-        // If it's exactly 11 chars with no dots, it's likely a YT ID
         if (urlStr.length === 11 && !urlStr.includes('.')) {
             return `https://www.youtube.com/watch?v=${urlStr}`;
         }
-        // Otherwise, it's our direct stream URL
         return urlStr;
     };
 
@@ -59,8 +51,6 @@ export default function Dashboard({ auth, currentStream, stats = {} }) {
 
             <div className="max-w-7xl mx-auto space-y-8">
                 <h1 className="text-2xl font-bold text-slate-800 tracking-tight">System Overview</h1>
-
-                {/* Stats Row */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                         <div className="flex justify-between items-start">
@@ -74,10 +64,7 @@ export default function Dashboard({ auth, currentStream, stats = {} }) {
                         </div>
                     </div>
                 </div>
-
-                {/* Stream Orchestrator Section */}
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                    {/* Video Preview Column */}
                     <div className="xl:col-span-2">
                         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden h-full flex flex-col">
                             <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
@@ -106,8 +93,6 @@ export default function Dashboard({ auth, currentStream, stats = {} }) {
                             </div>
                         </div>
                     </div>
-
-                    {/* Orchestrator Form Column */}
                     <div className="xl:col-span-1">
                         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 h-full flex flex-col">
                             <div className="px-6 py-5 border-b border-slate-100">
@@ -136,7 +121,6 @@ export default function Dashboard({ auth, currentStream, stats = {} }) {
                                     </div>
 
                                     <div className="pt-4">
-                                        {/* Removed the strict 11-character disable rule */}
                                         <button
                                             type="submit"
                                             disabled={processing || !data.url}

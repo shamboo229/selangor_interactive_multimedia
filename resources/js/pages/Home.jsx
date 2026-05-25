@@ -2,6 +2,7 @@ import React from 'react';
 import MultimediaLayout from '@/Layouts/MultimediaLayout';
 import VideoCard from '@/Components/VideoCard';
 import { Head } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 
 export default function Home({ auth, featuredLive, archiveVideos }) {
     console.log("Data direct dari Laravel:", featuredLive);
@@ -47,9 +48,8 @@ export default function Home({ auth, featuredLive, archiveVideos }) {
                             Berita & Info Semasa
                         </h3>
                     </div>
-                    <button className="group text-[11px] font-black text-blue-600 dark:text-blue-500 uppercase tracking-widest flex items-center gap-2 hover:gap-3 transition-all">
-                        Semua Berita <span className="text-lg">→</span>
-                    </button>
+                    <Link href="/berita" className="group text-[11px] font-black text-red-600 uppercase tracking-widest flex items-center gap-2 hover:gap-3 transition-all">Semua Berita<span className="text-lg">→</span>
+                    </Link>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -117,9 +117,8 @@ export default function Home({ auth, featuredLive, archiveVideos }) {
                             Arkib Terkini
                         </h3>
                     </div>
-                    <button className="group text-[11px] font-black text-red-600 uppercase tracking-widest flex items-center gap-2 hover:gap-3 transition-all">
-                        Lihat Semua <span className="text-lg">→</span>
-                    </button>
+                    <Link href="/arkib" className="group text-[11px] font-black text-red-600 uppercase tracking-widest flex items-center gap-2 hover:gap-3 transition-all">Lihat Semua <span className="text-lg">→</span>
+                    </Link>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
