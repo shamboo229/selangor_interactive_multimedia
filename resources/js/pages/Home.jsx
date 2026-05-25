@@ -1,11 +1,10 @@
 import React from 'react';
 import MultimediaLayout from '@/Layouts/MultimediaLayout';
 import VideoCard from '@/Components/VideoCard';
-import { Head } from '@inertiajs/react';
-import { Link } from '@inertiajs/react';
+import NewsGrid from '@/Components/NewsGrid';
+import { Head, Link } from '@inertiajs/react';
 
-export default function Home({ auth, featuredLive, archiveVideos }) {
-    console.log("Data direct dari Laravel:", featuredLive);
+export default function Home({ auth, featuredLive, archiveVideos, latestNews = [] }) {
     const actualLiveData = Array.isArray(featuredLive) ? featuredLive[0] : featuredLive;
     const liveData = actualLiveData || {};
     const videos = archiveVideos || [];
@@ -26,7 +25,6 @@ export default function Home({ auth, featuredLive, archiveVideos }) {
                 </marquee>
             </div>
 
-            {/* --- 1. MAIN LIVE STAGE --- */}
             <section className="-mt-8 mb-16">
                 {hasActiveStream ? (
                     <VideoCard stream={liveData} />
@@ -40,6 +38,7 @@ export default function Home({ auth, featuredLive, archiveVideos }) {
                     </div>
                 )}
             </section>
+
             <section className="mt-12 mb-16 px-4 md:px-8 max-w-[1800px] mx-auto">
                 <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center gap-4">
@@ -52,63 +51,9 @@ export default function Home({ auth, featuredLive, archiveVideos }) {
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-lg border border-slate-100 dark:border-slate-800 hover:shadow-xl transition-shadow group cursor-pointer flex flex-col">
-                        <div className="aspect-[16/10] bg-slate-200 dark:bg-slate-800 overflow-hidden relative">
-                            <img
-                                src="https://images.unsplash.com/photo-1577493341514-fc59bd825310?q=80&w=800&auto=format&fit=crop"
-                                alt="Dewan Negeri"
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                            />
-                        </div>
-                        <div className="p-6 flex flex-col flex-grow">
-                            <span className="text-slate-400 text-xs font-bold mb-2 uppercase tracking-wider">6 Mei 2026</span>
-                            <h4 className="text-lg font-bold text-slate-900 dark:text-white leading-snug mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                                Sidang Dewan Negeri Selangor Penggal Ke-15 Bermula Hari Ini
-                            </h4>
-                            <p className="text-slate-500 dark:text-slate-400 text-sm line-clamp-2 mt-auto">
-                                Ikuti liputan penuh perbahasan rang undang-undang dan inisiatif terbaru kerajaan negeri untuk kesejahteraan rakyat.
-                            </p>
-                        </div>
-                    </div>
-                    <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-lg border border-slate-100 dark:border-slate-800 hover:shadow-xl transition-shadow group cursor-pointer flex flex-col">
-                        <div className="aspect-[16/10] bg-slate-200 dark:bg-slate-800 overflow-hidden relative">
-                            <img
-                                src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=800&auto=format&fit=crop"
-                                alt="Mesyuarat"
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                            />
-                        </div>
-                        <div className="p-6 flex flex-col flex-grow">
-                            <span className="text-slate-400 text-xs font-bold mb-2 uppercase tracking-wider">5 Mei 2026</span>
-                            <h4 className="text-lg font-bold text-slate-900 dark:text-white leading-snug mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                                Pendaftaran Skim Mesra Usia Emas (SMUE) Kini Dibuka
-                            </h4>
-                            <p className="text-slate-500 dark:text-slate-400 text-sm line-clamp-2 mt-auto">
-                                Warga emas dijemput mendaftar secara dalam talian untuk menikmati manfaat baucar beli-belah tahunan.
-                            </p>
-                        </div>
-                    </div>
-                    <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-lg border border-slate-100 dark:border-slate-800 hover:shadow-xl transition-shadow group cursor-pointer flex flex-col hidden lg:flex">
-                        <div className="aspect-[16/10] bg-slate-200 dark:bg-slate-800 overflow-hidden relative">
-                            <img
-                                src="https://images.unsplash.com/photo-1605806616949-1e87b487cb2a?q=80&w=800&auto=format&fit=crop"
-                                alt="Media"
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                            />
-                        </div>
-                        <div className="p-6 flex flex-col flex-grow">
-                            <span className="text-slate-400 text-xs font-bold mb-2 uppercase tracking-wider">4 Mei 2026</span>
-                            <h4 className="text-lg font-bold text-slate-900 dark:text-white leading-snug mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                                Portal Multimedia Selangor Dinaik Taraf Ke Versi Baharu
-                            </h4>
-                            <p className="text-slate-500 dark:text-slate-400 text-sm line-clamp-2 mt-auto">
-                                Saksikan pengalaman penstriman yang lebih lancar dan mesra pengguna menerusi platform terkini kami.
-                            </p>
-                        </div>
-                    </div>
-                </div>
+                <NewsGrid newsItems={latestNews} />
             </section>
+
             <section className="mt-10 px-4 md:px-8">
                 <div className="flex items-center justify-between mb-10">
                     <div className="flex items-center gap-4">

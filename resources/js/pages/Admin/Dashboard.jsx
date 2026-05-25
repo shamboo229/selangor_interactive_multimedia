@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Head, useForm } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
-import ReactPlayer from 'react-player'; // Added this import
+import ReactPlayer from 'react-player';
 
 export default function Dashboard({ auth, currentStream, stats = {} }) {
     const { data, setData, post, processing } = useForm({

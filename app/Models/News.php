@@ -18,6 +18,7 @@ class News extends Model
         'is_featured',
         'publish_date',
         'resource',
+        'image_path',
     ];
 
     protected $casts = [
