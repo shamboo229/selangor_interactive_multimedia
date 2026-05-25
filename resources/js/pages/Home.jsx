@@ -2,13 +2,24 @@ import React from 'react';
 import MultimediaLayout from '@/Layouts/MultimediaLayout';
 import VideoCard from '@/Components/VideoCard';
 import NewsGrid from '@/Components/NewsGrid';
+import ArchiveGrid from '@/Components/ArchiveGrid';
+import AssetsGrid from '@/Components/AssetsGrid';
 import { Head, Link } from '@inertiajs/react';
 
-export default function Home({ auth, featuredLive, archiveVideos, latestNews = [] }) {
+export default function Home({ auth, featuredLive, archiveVideos, latestNews = [], latestAssets = [] }) {
     const actualLiveData = Array.isArray(featuredLive) ? featuredLive[0] : featuredLive;
     const liveData = actualLiveData || {};
     const videos = archiveVideos || [];
     const hasActiveStream = liveData.stream_url || liveData.url || liveData.stream_id || liveData.id;
+
+    // Optional: Inject demo assets if database is completely empty so you can visualize it on Home
+    const demoAssets = [
+        { asset_id: 1, category: 'Artworks', views: 3420, file_path: 'demo-art.jpg' },
+        { asset_id: 2, category: 'Posters', views: 1205, file_path: 'demo-poster.jpg' },
+        { asset_id: 3, category: 'Videos', views: 8900, file_path: 'demo-video.mp4' },
+        { asset_id: 4, category: 'Animations', views: 450, file_path: 'demo-anim.mp4' }
+    ];
+    const displayAssets = latestAssets && latestAssets.length > 0 ? latestAssets : demoAssets;
 
     return (
         <MultimediaLayout auth={auth}>
@@ -54,11 +65,11 @@ export default function Home({ auth, featuredLive, archiveVideos, latestNews = [
                 <NewsGrid newsItems={latestNews} />
             </section>
 
-            <section className="mt-10 px-4 md:px-8">
+            <section className="mt-10 px-4 md:px-8 max-w-[1800px] mx-auto">
                 <div className="flex items-center justify-between mb-10">
                     <div className="flex items-center gap-4">
                         <div className="w-2 h-8 bg-red-600 rounded-full"></div>
-                        <h3 className="text-2xl font-black uppercase tracking-tight">
+                        <h3 className="text-2xl font-black uppercase tracking-tight dark:text-white">
                             Arkib Terkini
                         </h3>
                     </div>
@@ -66,29 +77,22 @@ export default function Home({ auth, featuredLive, archiveVideos, latestNews = [
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {videos.map((video) => (
-                        <div key={video.stream_id} className="group cursor-pointer">
-                            <div className="relative aspect-video rounded-3xl overflow-hidden mb-4 shadow-xl bg-slate-200 border border-transparent group-hover:border-red-500/50 transition-all">
-                                <img
-                                    src={video.thumbnail || `https://img.youtube.com/vi/${video.stream_url}/mqdefault.jpg`}
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                                    alt={video.title}
-                                />
-                                <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-2xl transform translate-y-4 group-hover:translate-y-0 transition-transform">
-                                        <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-red-600 border-b-[6px] border-b-transparent ml-1"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="px-1">
-                                <h4 className="font-black text-sm leading-tight group-hover:text-red-600 transition-colors line-clamp-2">
-                                    {video.title}
-                                </h4>
-                            </div>
-                        </div>
-                    ))}
+                <ArchiveGrid videos={videos} />
+            </section>
+
+            <section className="mt-16 mb-16 px-4 md:px-8 max-w-[1800px] mx-auto">
+                <div className="flex items-center justify-between mb-10">
+                    <div className="flex items-center gap-4">
+                        <div className="w-2 h-8 bg-amber-500 rounded-full"></div>
+                        <h3 className="text-2xl font-black uppercase tracking-tight dark:text-white">
+                            Karya Kreatif
+                        </h3>
+                    </div>
+                    <Link href="/karya" className="group text-[11px] font-black text-red-600 uppercase tracking-widest flex items-center gap-2 hover:gap-3 transition-all">Muat Turun Karya<span className="text-lg">→</span>
+                    </Link>
                 </div>
+
+                <AssetsGrid assets={displayAssets} />
             </section>
         </MultimediaLayout>
     );

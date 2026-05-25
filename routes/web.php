@@ -11,11 +11,14 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    // Fetch the active stream
     $stream = Stream::where('is_active', true)->latest()->first();
-
-    // Fetch the latest 3 news items
     $latestNews = News::orderBy('publish_date', 'desc')->take(3)->get();
+
+    // Fetch the 4 latest published assets
+    $latestAssets = \App\Models\Asset::where('status', '!=', 'unpublished')
+                                     ->latest()
+                                     ->take(4)
+                                     ->get();
 
     return Inertia::render('Home', [
         'featuredLive' => [
@@ -25,15 +28,14 @@ Route::get('/', function () {
             'category'    => 'LIVE',
             'description' => 'Selamat datang ke portal multimedia Selangor',
         ],
-        'archiveVideos' => Stream::where('is_active', false)->latest()->get(),
-
-        // Pass the news to your React component
+        'archiveVideos' => Stream::where('is_active', false)->latest()->take(4)->get(),
         'latestNews'    => $latestNews,
+        'latestAssets'  => $latestAssets, // Pass it to React here
     ]);
 })->name('home');
 
 Route::get('/berita', function () {
-    $news = \App\Models\News::orderBy('publish_date', 'desc')->get();
+    $news = News::orderBy('publish_date', 'desc')->get();
 
     return Inertia::render('InfoSemasa', [
         'newsItems' => $news
@@ -41,7 +43,11 @@ Route::get('/berita', function () {
 })->name('berita');
 
 Route::get('/karya', function () {
-    return Inertia::render('KaryaKreatif');
+    $assets = \App\Models\Asset::where('status', '!=', 'unpublished')->latest()->get();
+
+    return Inertia::render('KaryaKreatif', [
+        'assets' => $assets
+    ]);
 })->name('karya');
 
 Route::get('/arkib', function () {
@@ -57,16 +63,20 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->name('logout');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/admin', [AdminController::class, 'Dashboard'])->name('dashboard');
-    Route::get('/admin/news', [NewsController::class, 'index'])->name('admin.news.index');
-    Route::post('/admin/news', [NewsController::class, 'store'])->name('admin.news.store');
-    Route::put('/admin/news/{news}', [NewsController::class, 'update'])->name('admin.news.update');
-    Route::get('/admin/assets', [AssetController::class, 'index'])->name('admin.assets.index');
-    Route::post('/admin/update-stream', [AdminController::class, 'updateStream'])
-        ->name('admin.stream.update');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [AdminController::class, 'Dashboard'])->name('dashboard');
+    Route::post('/update-stream', [AdminController::class, 'updateStream'])->name('stream.update');
+    Route::get('/news', [NewsController::class, 'index'])->name('news.index');
+    Route::post('/news', [NewsController::class, 'store'])->name('news.store');
+    Route::put('/news/{news}', [NewsController::class, 'update'])->name('news.update');
+    Route::get('/assets', [AssetController::class, 'index'])->name('assets.index');
+    Route::get('/assets/create', [AssetController::class, 'create'])->name('assets.create');
+    Route::post('/assets', [AssetController::class, 'store'])->name('assets.store');
+    Route::delete('/assets/{id}', [AssetController::class, 'destroy'])->name('assets.destroy');
+});
 });
 
 require __DIR__.'/auth.php';
