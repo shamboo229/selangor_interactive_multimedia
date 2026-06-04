@@ -13,7 +13,7 @@ class AssetController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Admin/MediaLibrary', [
+        return Inertia::render('Admin/MediaManager', [
             'assets' => Asset::with('contributor')->latest()->get()
         ]);
     }

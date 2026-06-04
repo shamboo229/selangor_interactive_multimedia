@@ -1,10 +1,10 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\AssetController;
+use App\Http\Controllers\PublicSubmissionController;
 use App\Models\Stream;
 use App\Models\News;
 use Illuminate\Support\Facades\Route;
@@ -14,7 +14,6 @@ Route::get('/', function () {
     $stream = Stream::where('is_active', true)->latest()->first();
     $latestNews = News::orderBy('publish_date', 'desc')->take(3)->get();
 
-    // Fetch the 4 latest published assets
     $latestAssets = \App\Models\Asset::where('status', '!=', 'unpublished')
                                      ->latest()
                                      ->take(4)
@@ -30,7 +29,7 @@ Route::get('/', function () {
         ],
         'archiveVideos' => Stream::where('is_active', false)->latest()->take(4)->get(),
         'latestNews'    => $latestNews,
-        'latestAssets'  => $latestAssets, // Pass it to React here
+        'latestAssets'  => $latestAssets,
     ]);
 })->name('home');
 
@@ -50,6 +49,8 @@ Route::get('/karya', function () {
     ]);
 })->name('karya');
 
+Route::post('/karya/submit', [PublicSubmissionController::class, 'store']);
+
 Route::get('/arkib', function () {
     return Inertia::render('ArkibDigital', [
         'archiveVideos' => Stream::where('is_active', false)->latest()->get(),
@@ -58,25 +59,26 @@ Route::get('/arkib', function () {
 
 Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
-Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
-    ->name('logout');
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+// Admin Workspace Routes (Only requires auth)
+Route::middleware(['auth'])->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
-    Route::get('/', [AdminController::class, 'Dashboard'])->name('dashboard');
-    Route::post('/update-stream', [AdminController::class, 'updateStream'])->name('stream.update');
-    Route::get('/news', [NewsController::class, 'index'])->name('news.index');
-    Route::post('/news', [NewsController::class, 'store'])->name('news.store');
-    Route::put('/news/{news}', [NewsController::class, 'update'])->name('news.update');
-    Route::get('/assets', [AssetController::class, 'index'])->name('assets.index');
-    Route::get('/assets/create', [AssetController::class, 'create'])->name('assets.create');
-    Route::post('/assets', [AssetController::class, 'store'])->name('assets.store');
-    Route::delete('/assets/{id}', [AssetController::class, 'destroy'])->name('assets.destroy');
+        Route::get('/', [AdminController::class, 'Dashboard'])->name('dashboard');
+        Route::post('/update-stream', [AdminController::class, 'updateStream'])->name('stream.update');
+        Route::get('/news', [NewsController::class, 'index'])->name('news.index');
+        Route::post('/news', [NewsController::class, 'store'])->name('news.store');
+        Route::put('/news/{news}', [NewsController::class, 'update'])->name('news.update');
+        Route::get('/assets', [AssetController::class, 'index'])->name('assets.index');
+        Route::get('/assets/create', [AssetController::class, 'create'])->name('assets.create');
+        Route::post('/assets', [AssetController::class, 'store'])->name('assets.store');
+        Route::delete('/assets/{id}', [AssetController::class, 'destroy'])->name('assets.destroy');
+    });
 });
-});
+
+// Catch default auth redirection and send to admin workspace
+Route::get('/dashboard', function () {
+    return redirect()->route('admin.dashboard');
+})->middleware(['auth'])->name('dashboard');
 
 require __DIR__.'/auth.php';
