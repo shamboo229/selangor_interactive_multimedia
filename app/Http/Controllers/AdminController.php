@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Models\Stream;
+use App\Models\News;
+use App\Models\Asset;
 
 class AdminController extends Controller
 {
@@ -20,8 +22,9 @@ class AdminController extends Controller
                 'url'   => $activeStream->stream_url ?? '',
             ],
             'stats' => [
-                'active_users' => 0,
-                'total_views'  => 0,
+                'news'           => News::count(),
+                'assets'         => Asset::count(),
+                'streamArchives' => Stream::count(),
             ]
         ]);
     }

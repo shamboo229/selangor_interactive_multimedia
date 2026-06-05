@@ -25,7 +25,7 @@ Route::get('/', function () {
             'title'       => $stream->title ?? 'Tiada Siaran Aktif',
             'is_active'   => $stream ? true : false,
             'category'    => 'LIVE',
-            'description' => 'Selamat datang ke portal multimedia Selangor',
+            'description' => $stream->description ?? 'Selamat datang ke portal multimedia Selangor',
         ],
         'archiveVideos' => Stream::where('is_active', false)->latest()->take(4)->get(),
         'latestNews'    => $latestNews,
