@@ -49,7 +49,7 @@ Route::get('/karya', function () {
     ]);
 })->name('karya');
 
-Route::post('/karya/submit', [PublicSubmissionController::class, 'store']);
+Route::post('/karya-kreatif/submit', [PublicSubmissionController::class, 'store']);
 
 Route::get('/arkib', function () {
     return Inertia::render('ArkibDigital', [
@@ -73,6 +73,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/assets/create', [AssetController::class, 'create'])->name('assets.create');
         Route::post('/assets', [AssetController::class, 'store'])->name('assets.store');
         Route::delete('/assets/{id}', [AssetController::class, 'destroy'])->name('assets.destroy');
+        Route::patch('/assets/{id}/approve', [AssetController::class, 'approve'])->name('assets.approve');
     });
 });
 

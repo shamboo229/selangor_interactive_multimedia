@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 
-export default function MediaManager({ auth, assets = [], pendingSubmissions = [] }) {
-    const [activeTab, setActiveTab] = useState('published'); // 'published' or 'pending'
+export default function MediaManager({ auth, assets = [], pendingAssets = [] }) {
+    const [activeTab, setActiveTab] = useState('published');
 
-    // Action: Delete Published Asset
+    // Action: Delete Published Asset (or Reject Pending)
     const handleDelete = (id) => {
         if (confirm('Are you sure you want to delete this asset? This cannot be undone.')) {
             router.delete(`/admin/assets/${id}`);
@@ -15,14 +15,7 @@ export default function MediaManager({ auth, assets = [], pendingSubmissions = [
     // Action: Approve Pending Submission
     const handleApprove = (id) => {
         if (confirm('Approve this submission? It will be moved to the public library.')) {
-            router.post(`/admin/submissions/${id}/approve`);
-        }
-    };
-
-    // Action: Reject Pending Submission
-    const handleReject = (id) => {
-        if (confirm('Reject and delete this submission? This cannot be undone.')) {
-            router.delete(`/admin/submissions/${id}/reject`);
+            router.patch(`/admin/assets/${id}/approve`);
         }
     };
 
@@ -67,15 +60,15 @@ export default function MediaManager({ auth, assets = [], pendingSubmissions = [
                         }`}
                     >
                         Pending Reviews
-                        {pendingSubmissions.length > 0 && (
+                        {pendingAssets.length > 0 && (
                             <span className="bg-orange-100 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400 py-0.5 px-2 rounded-full text-xs">
-                                {pendingSubmissions.length}
+                                {pendingAssets.length}
                             </span>
                         )}
                     </button>
                 </div>
 
-                {/* TAB CONTENT: Published Media (Your Original Grid) */}
+                {/* TAB CONTENT: Published Media */}
                 {activeTab === 'published' && (
                     <>
                         {assets.length === 0 ? (
@@ -91,9 +84,6 @@ export default function MediaManager({ auth, assets = [], pendingSubmissions = [
                                     <div key={asset.asset_id} className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden group hover:shadow-md transition-shadow">
                                         <div className="aspect-square bg-slate-100 dark:bg-slate-900 relative">
                                             <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity z-20 flex items-center justify-center gap-3 backdrop-blur-sm">
-                                                <Link href={`/admin/assets/${asset.asset_id}/edit`} className="p-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-colors shadow-lg">
-                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                                </Link>
                                                 <button onClick={() => handleDelete(asset.asset_id)} className="p-2 bg-white text-red-600 rounded-lg hover:bg-red-50 transition-colors shadow-lg">
                                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                                 </button>
@@ -136,10 +126,10 @@ export default function MediaManager({ auth, assets = [], pendingSubmissions = [
                     </>
                 )}
 
-                {/* TAB CONTENT: Pending Reviews (New List View) */}
+                {/* TAB CONTENT: Pending Reviews */}
                 {activeTab === 'pending' && (
                     <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
-                        {pendingSubmissions.length === 0 ? (
+                        {pendingAssets.length === 0 ? (
                             <div className="text-center py-16">
                                 <svg className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
                                 <p className="text-slate-500 font-medium text-sm">No pending submissions to review.</p>
@@ -156,11 +146,16 @@ export default function MediaManager({ auth, assets = [], pendingSubmissions = [
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100 dark:divide-slate-700/50">
-                                        {pendingSubmissions.map((sub) => (
-                                            <tr key={sub.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+                                        {pendingAssets.map((sub) => (
+                                            <tr key={sub.asset_id} className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
                                                 <td className="px-6 py-4">
-                                                    <p className="font-bold text-slate-800 dark:text-white">{sub.contributor_name}</p>
-                                                    <p className="text-xs text-slate-400">{sub.email}</p>
+                                                    {/* FIXED: Reading the details dynamically from the relation! */}
+                                                    <p className="font-bold text-slate-800 dark:text-white">
+                                                        {sub.contributor?.cont_name || 'Unknown Contributor'}
+                                                    </p>
+                                                    <p className="text-xs text-slate-400">
+                                                        {sub.contributor?.email || 'N/A'}
+                                                    </p>
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <p className="font-semibold text-slate-800 dark:text-slate-200">{sub.title}</p>
@@ -181,13 +176,13 @@ export default function MediaManager({ auth, assets = [], pendingSubmissions = [
                                                 </td>
                                                 <td className="px-6 py-4 text-right space-x-2 whitespace-nowrap">
                                                     <button
-                                                        onClick={() => handleApprove(sub.id)}
+                                                        onClick={() => handleApprove(sub.asset_id)}
                                                         className="px-3 py-1.5 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-lg text-xs font-bold transition-colors"
                                                     >
                                                         Approve
                                                     </button>
                                                     <button
-                                                        onClick={() => handleReject(sub.id)}
+                                                        onClick={() => handleDelete(sub.asset_id)}
                                                         className="px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 rounded-lg text-xs font-bold transition-colors"
                                                     >
                                                         Reject

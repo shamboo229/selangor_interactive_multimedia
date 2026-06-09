@@ -2,36 +2,49 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PendingSubmission;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use App\Models\Asset;
+use App\Models\Contributor;
+use Inertia\Inertia;
 
 class PublicSubmissionController extends Controller
 {
     public function store(Request $request)
     {
+        // 1. Validate the form
         $request->validate([
             'contributor_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'title' => 'required|string|max:255',
-            'category' => 'required|string|in:Artworks,Posters,Videos,Animations,PDF',
-            'file' => 'required|file|max:51200', // Set up to 50MB maximum limit
+            'email'            => 'required|email|max:255',
+            'title'            => 'required|string|max:255',
+            'category'         => 'required|string',
+            'file'             => 'required|file|mimes:jpg,jpeg,png,pdf,mp4|max:51200',
         ]);
 
-        if ($request->hasFile('file')) {
-            // Save inside local storage folder: storage/app/public/pending/
-            $path = $request->file('file')->store('pending', 'public');
+        // 2. Find or create the contributor
+        $contributor = Contributor::firstOrCreate(
+            ['email' => $request->email],
+            ['cont_name' => $request->contributor_name]
+        );
 
-            PendingSubmission::create([
-                'contributor_name' => $request->contributor_name,
-                'email' => $request->email,
-                'title' => $request->title,
-                'category' => $request->category,
-                'file_path' => $path,
-                'status' => 'pending',
-            ]);
+        // 3. Initialize file path
+        $filePath = null;
+
+        // 4. Safely upload the file
+        if ($request->hasFile('file')) {
+            $filePath = $request->file('file')->store('assets', 'public');
         }
 
-        return redirect()->back();
+        // 5. Create ONE asset record using the uploaded file path
+        Asset::create([
+            'title'     => $request->title,
+            'category'  => $request->category,
+            'file_path' => $filePath,
+            'status'    => 'pending',
+            'cont_id'   => $contributor->cont_id ?? $contributor->id, // Link to the contributor
+            'views'     => 0,
+        ]);
+
+        // 6. Return success message
+        return back()->with('success', 'Karya berjaya dihantar!');
     }
 }

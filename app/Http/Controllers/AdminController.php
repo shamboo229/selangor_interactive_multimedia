@@ -18,8 +18,9 @@ class AdminController extends Controller
 
         return Inertia::render('Admin/Dashboard', [
             'currentStream' => [
-                'title' => $activeStream->title ?? '',
-                'url'   => $activeStream->stream_url ?? '',
+                'title'       => $activeStream->title ?? '',
+                'url'         => $activeStream->stream_url ?? '',
+                'description' => $activeStream->description ?? '',
             ],
             'stats' => [
                 'news'           => News::count(),
@@ -32,8 +33,9 @@ class AdminController extends Controller
     public function updateStream(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'url'   => 'required|string',
+            'title'       => 'required|string|max:255',
+            'url'         => 'required|string',
+            'description' => 'nullable|string',
         ]);
 
         $videoId = $this->extractYoutubeId($validated['url']);
@@ -41,10 +43,11 @@ class AdminController extends Controller
         DB::transaction(function () use ($validated, $videoId) {
             Stream::where('is_active', true)->update(['is_active' => false]);
             Stream::create([
-                'title'      => $validated['title'],
-                'stream_url' => $videoId,
-                'admin_id'   => Auth::id() ?? 1,
-                'is_active'  => true,
+                'title'       => $validated['title'],
+                'stream_url'  => $videoId,
+                'description' => $validated['description'] ?? null,
+                'admin_id'    => Auth::id() ?? 1,
+                'is_active'   => true,
             ]);
         });
 
