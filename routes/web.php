@@ -49,8 +49,6 @@ Route::get('/karya', function () {
     ]);
 })->name('karya');
 
-Route::post('/karya-kreatif/submit', [PublicSubmissionController::class, 'store']);
-
 Route::get('/arkib', function () {
     return Inertia::render('ArkibDigital', [
         'archiveVideos' => Stream::where('is_active', false)->latest()->get(),
@@ -61,7 +59,6 @@ Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('l
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
-// Admin Workspace Routes (Only requires auth)
 Route::middleware(['auth'])->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/', [AdminController::class, 'Dashboard'])->name('dashboard');
@@ -70,14 +67,11 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/news', [NewsController::class, 'store'])->name('news.store');
         Route::put('/news/{news}', [NewsController::class, 'update'])->name('news.update');
         Route::get('/assets', [AssetController::class, 'index'])->name('assets.index');
-        Route::get('/assets/create', [AssetController::class, 'create'])->name('assets.create');
         Route::post('/assets', [AssetController::class, 'store'])->name('assets.store');
         Route::delete('/assets/{id}', [AssetController::class, 'destroy'])->name('assets.destroy');
-        Route::patch('/assets/{id}/approve', [AssetController::class, 'approve'])->name('assets.approve');
     });
 });
 
-// Catch default auth redirection and send to admin workspace
 Route::get('/dashboard', function () {
     return redirect()->route('admin.dashboard');
 })->middleware(['auth'])->name('dashboard');
