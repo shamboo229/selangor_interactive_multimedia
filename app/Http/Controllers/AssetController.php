@@ -13,10 +13,8 @@ class AssetController extends Controller
 {
     public function index()
     {
-        // Fetch published assets for the main media manager
-        $publishedAssets = Asset::with('contributor')->where('status', 'published')->latest()->get();
 
-        // Fetch pending assets for the review queue
+        $publishedAssets = Asset::with('contributor')->where('status', 'published')->latest()->get();
         $pendingAssets = Asset::with('contributor')->where('status', 'pending')->latest()->get();
 
         return Inertia::render('Admin/MediaManager', [
@@ -35,7 +33,7 @@ class AssetController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title'    => 'required|string|max:255', // Fixed max|255 to max:255
+            'title'    => 'required|string|max:255',
             'category' => 'required|string',
             'status'   => 'required|string',
             'cont_id'  => 'nullable|exists:contributors,cont_id',
@@ -59,19 +57,6 @@ class AssetController extends Controller
         return redirect()->route('admin.assets.index')->with('success', 'Asset uploaded successfully.');
     }
 
-    // NEW APPROVE METHOD
-    public function approve($id)
-    {
-        $asset = Asset::findOrFail($id);
-
-        // Change status from 'pending' to 'published'
-        $asset->update([
-            'status' => 'published'
-        ]);
-
-        return back()->with('success', 'Karya berjaya diluluskan dan diterbitkan! (Asset approved and published!)');
-    }
-
     public function destroy($id)
     {
         $asset = Asset::findOrFail($id);
@@ -84,4 +69,3 @@ class AssetController extends Controller
         return redirect()->back()->with('success', 'Asset deleted successfully.');
     }
 }
-    

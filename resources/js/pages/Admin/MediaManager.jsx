@@ -16,7 +16,6 @@ export default function MediaManager({ auth, assets = [] }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Posts directly to your admin store route
         post('/admin/assets', {
             forceFormData: true,
             preserveScroll: true,
@@ -27,7 +26,6 @@ export default function MediaManager({ auth, assets = [] }) {
         });
     };
 
-    // Action: Delete Published Asset
     const handleDelete = (id) => {
         if (confirm('Are you sure you want to delete this asset? This cannot be undone.')) {
             router.delete(`/admin/assets/${id}`);
@@ -39,7 +37,6 @@ export default function MediaManager({ auth, assets = [] }) {
             <Head title="Media Manager - SIM Workspace" />
 
             <div className="max-w-7xl mx-auto space-y-6">
-                {/* Header */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-slate-200 dark:border-slate-700 pb-6">
                     <div>
                         <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">Pengurusan Media (Media Manager)</h1>
@@ -63,8 +60,6 @@ export default function MediaManager({ auth, assets = [] }) {
                         )}
                     </button>
                 </div>
-
-                {/* INLINE UPLOAD FORM */}
                 {showUploadForm && (
                     <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm mb-8 space-y-6">
                         <div className="border-b border-slate-100 dark:border-slate-700 pb-4 mb-4">
@@ -73,7 +68,6 @@ export default function MediaManager({ auth, assets = [] }) {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Contributor Details */}
                             <div>
                                 <label className="block text-xs font-semibold text-slate-500 mb-1">Nama Penyumbang / Contributor Name <span className="text-red-500">*</span></label>
                                 <input
@@ -100,7 +94,6 @@ export default function MediaManager({ auth, assets = [] }) {
                                 {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                             </div>
 
-                            {/* Asset Details */}
                             <div>
                                 <label className="block text-xs font-semibold text-slate-500 mb-1">Tajuk Karya / Asset Title <span className="text-red-500">*</span></label>
                                 <input
@@ -130,7 +123,7 @@ export default function MediaManager({ auth, assets = [] }) {
                                 {errors.category && <p className="text-red-500 text-xs mt-1">{errors.category}</p>}
                             </div>
 
-                            {/* File Upload */}
+
                             <div className="md:col-span-2">
                                 <label className="block text-xs font-semibold text-slate-500 mb-1">Fail / File Attachment <span className="text-red-500">*</span></label>
                                 <div className="border-2 border-dashed border-slate-200 dark:border-slate-600 rounded-xl p-4 text-center hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
@@ -146,7 +139,7 @@ export default function MediaManager({ auth, assets = [] }) {
                             </div>
                         </div>
 
-                        {/* Progress Bar */}
+
                         {progress && (
                             <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5 mt-4">
                                 <div className="bg-red-600 h-2.5 rounded-full transition-all duration-300" style={{ width: `${progress.percentage}%` }}></div>
@@ -166,7 +159,6 @@ export default function MediaManager({ auth, assets = [] }) {
                     </form>
                 )}
 
-                {/* Published Media Grid */}
                 {assets.length === 0 ? (
                     <div className="text-center py-24 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 border-dashed">
                         <svg className="w-16 h-16 mx-auto text-slate-300 dark:text-slate-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
