@@ -13,31 +13,24 @@ class AssetController extends Controller
 {
     public function index()
     {
-
-        $publishedAssets = Asset::with('contributor')->where('status', 'published')->latest()->get();
-        $pendingAssets = Asset::with('contributor')->where('status', 'pending')->latest()->get();
+        $publishedAssets = Asset::with('contributor')
+            ->where('status', 'published')
+            ->latest()
+            ->get();
 
         return Inertia::render('Admin/MediaManager', [
-            'assets'        => $publishedAssets,
-            'pendingAssets' => $pendingAssets
-        ]);
-    }
-
-    public function create()
-    {
-        return Inertia::render('Admin/Assets/Form', [
-            'contributors' => Contributor::select('cont_id', 'name')->get()
+            'assets' => $publishedAssets
         ]);
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'title'    => 'required|string|max:255',
-            'category' => 'required|string',
-            'status'   => 'required|string',
-            'cont_id'  => 'nullable|exists:contributors,cont_id',
-            'file'     => 'required|file|mimes:jpeg,png,jpg,gif,svg,pdf,mp4|max:51200', // 50MB max limit
+            'contributor_name' => 'required|string|max:255',
+            'email'            => 'required|email|max:255',
+            'title'            => 'required|string|max:255',
+            'category'         => 'required|string',
+            'file'             => 'required|file|mimes:jpeg,png,jpg,gif,svg,pdf,mp4|max:51200',
         ]);
 
         $filePath = null;
@@ -45,21 +38,27 @@ class AssetController extends Controller
             $filePath = $request->file('file')->store('assets', 'public');
         }
 
+        $contributor = Contributor::firstOrCreate(
+            ['email' => $request->email],
+            ['cont_name' => $request->contributor_name]
+        );
+
         Asset::create([
             'title'     => $request->title,
             'category'  => $request->category,
-            'status'    => $request->status,
-            'cont_id'   => $request->cont_id,
+            'status'    => 'published',
+            'cont_id'   => $contributor->cont_id,
             'file_path' => $filePath,
             'views'     => 0,
         ]);
 
-        return redirect()->route('admin.assets.index')->with('success', 'Asset uploaded successfully.');
+        return redirect()->back()->with('success', 'Asset uploaded successfully.');
     }
 
     public function destroy($id)
     {
         $asset = Asset::findOrFail($id);
+
         if ($asset->file_path && Storage::disk('public')->exists($asset->file_path)) {
             Storage::disk('public')->delete($asset->file_path);
         }

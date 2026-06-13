@@ -7,15 +7,8 @@ export default function KaryaKreatif({ assets }) {
     // We only need one simple state now to toggle the instructions!
     const [showInstructions, setShowInstructions] = useState(false);
 
-    const demoAssets = [
-        { asset_id: 1, category: 'Artworks', views: 3420, file_path: 'demo-art.jpg' },
-        { asset_id: 2, category: 'Posters', views: 1205, file_path: 'demo-poster.jpg' },
-        { asset_id: 3, category: 'Videos', views: 8900, file_path: 'demo-video.mp4' },
-        { asset_id: 4, category: 'Animations', views: 450, file_path: 'demo-anim.mp4' },
-        { asset_id: 5, category: 'Artworks', views: 2100, file_path: 'demo-art-2.jpg' }
-    ];
 
-    const displayAssets = assets && assets.length > 0 ? assets : demoAssets;
+    const displayAssets = assets;
 
     return (
         <MultimediaLayout>
@@ -47,7 +40,6 @@ export default function KaryaKreatif({ assets }) {
                     </button>
                 </header>
 
-                {/* Email Instructions Panel */}
                 {showInstructions && (
                     <div className="bg-blue-50/50 dark:bg-slate-900 p-6 md:p-8 rounded-3xl border border-blue-100 dark:border-slate-800 shadow-sm space-y-6">
                         <div className="border-b border-blue-100 dark:border-slate-800 pb-4 mb-4 flex items-center gap-4">
