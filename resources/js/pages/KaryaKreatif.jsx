@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
-import { Head } from '@inertiajs/react'; // Removed useForm!
+import { Head } from '@inertiajs/react';
 import MultimediaLayout from '@/Layouts/MultimediaLayout';
 import AssetGrid from '@/Components/AssetsGrid';
 
 export default function KaryaKreatif({ assets }) {
-    // We only need one simple state now to toggle the instructions!
     const [showInstructions, setShowInstructions] = useState(false);
-
-
     const displayAssets = assets;
 
     return (

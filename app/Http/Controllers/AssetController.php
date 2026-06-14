@@ -7,6 +7,8 @@ use App\Models\Asset;
 use App\Models\Contributor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class AssetController extends Controller
@@ -16,7 +18,13 @@ class AssetController extends Controller
         $publishedAssets = Asset::with('contributor')
             ->where('status', 'published')
             ->latest()
-            ->get();
+            ->get()
+            ->map(function ($asset) {
+                if ($asset->file_path) {
+                    $asset->file_path = Storage::disk('s3')->url($asset->file_path);
+                }
+                return $asset;
+            });
 
         return Inertia::render('Admin/MediaManager', [
             'assets' => $publishedAssets
@@ -35,12 +43,15 @@ class AssetController extends Controller
 
         $filePath = null;
         if ($request->hasFile('file')) {
-            $filePath = $request->file('file')->store('assets', 'public');
+            $filePath = $request->file('file')->store('assets');
         }
 
         $contributor = Contributor::firstOrCreate(
             ['email' => $request->email],
-            ['cont_name' => $request->contributor_name]
+            [
+                'cont_name' => $request->contributor_name,
+                'password'  => Hash::make(Str::random(16))
+            ]
         );
 
         Asset::create([
@@ -59,8 +70,8 @@ class AssetController extends Controller
     {
         $asset = Asset::findOrFail($id);
 
-        if ($asset->file_path && Storage::disk('public')->exists($asset->file_path)) {
-            Storage::disk('public')->delete($asset->file_path);
+        if ($asset->file_path && Storage::disk('s3')->exists($asset->file_path)) {
+            Storage::disk('s3')->delete($asset->file_path);
         }
 
         $asset->delete();
