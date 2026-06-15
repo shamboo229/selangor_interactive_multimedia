@@ -15,6 +15,7 @@ class Contributor extends Authenticatable
         'cont_name',
         'email',
         'password',
+        'orgranization',
     ];
 
     protected $hidden = [

@@ -3,13 +3,22 @@ import { Head, useForm } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import Hls from 'hls.js';
 
-export default function Dashboard({ auth, currentStream, stats = {} }) {
+export default function Dashboard({ auth, currentStream, stats = {}, announcementText = '' }) {
     const videoRef = useRef(null);
 
     const { data, setData, post, processing } = useForm({
         title: currentStream?.title || '',
         url: currentStream?.url || '',
         description: currentStream?.description || '',
+    });
+
+    const {
+        data: announcementData,
+        setData: setAnnouncementData,
+        put: putAnnouncement,
+        processing: processingAnnouncement
+    } = useForm({
+        content: announcementText,
     });
 
     useEffect(() => {
@@ -23,6 +32,13 @@ export default function Dashboard({ auth, currentStream, stats = {} }) {
     const submitLiveUpdate = (e) => {
         e.preventDefault();
         post(route('admin.stream.update'), {
+            preserveScroll: true,
+        });
+    };
+
+    const submitAnnouncement = (e) => {
+        e.preventDefault();
+        putAnnouncement(route('admin.announcement.update'), {
             preserveScroll: true,
         });
     };
@@ -128,6 +144,33 @@ export default function Dashboard({ auth, currentStream, stats = {} }) {
                                 </svg>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+                        <h2 className="text-base font-bold text-slate-800">Live Announcement Banner</h2>
+                        <span className="bg-red-50 text-red-600 text-xs px-3 py-1 rounded-full font-semibold">Global Banner</span>
+                    </div>
+                    <div className="p-6">
+                        <form onSubmit={submitAnnouncement} className="flex flex-col sm:flex-row gap-4 items-end">
+                            <div className="flex-1 w-full">
+                                <label className="block text-sm font-semibold text-slate-700 mb-2">Scrolling Text Content</label>
+                                <input
+                                    value={announcementData.content}
+                                    onChange={e => setAnnouncementData('content', e.target.value)}
+                                    className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-4 focus:ring-red-500/10 focus:border-red-500 block p-3.5 outline-none"
+                                    placeholder="e.g., Daftar Skim Mesra Usia Emas (SMUE) di portal rasmi..."
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={processingAnnouncement || !announcementData.content}
+                                className="w-full sm:w-auto text-white bg-slate-800 hover:bg-slate-900 disabled:bg-slate-300 font-bold rounded-xl text-sm px-8 py-3.5 transition-all h-[52px]"
+                            >
+                                {processingAnnouncement ? 'Updating...' : 'Update Banner'}
+                            </button>
+                        </form>
                     </div>
                 </div>
 

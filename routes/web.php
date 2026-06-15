@@ -5,8 +5,10 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\PublicSubmissionController;
+use App\Http\Controllers\AnnouncementController;
 use App\Models\Stream;
 use App\Models\News;
+use App\Models\Announcement;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -19,6 +21,8 @@ Route::get('/', function () {
                                      ->take(4)
                                      ->get();
 
+    $announcement = Announcement::first();
+
     return Inertia::render('Home', [
         'featuredLive' => [
             'id'          => $stream->stream_url ?? null,
@@ -30,6 +34,7 @@ Route::get('/', function () {
         'archiveVideos' => Stream::where('is_active', false)->latest()->take(4)->get(),
         'latestNews'    => $latestNews,
         'latestAssets'  => $latestAssets,
+        'announcementText' => $announcement ? $announcement->content : 'Selamat Datang ke SIM Workspace!',
     ]);
 })->name('home');
 
@@ -63,12 +68,16 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/', [AdminController::class, 'Dashboard'])->name('dashboard');
         Route::post('/update-stream', [AdminController::class, 'updateStream'])->name('stream.update');
+
         Route::get('/news', [NewsController::class, 'index'])->name('news.index');
         Route::post('/news', [NewsController::class, 'store'])->name('news.store');
         Route::put('/news/{news}', [NewsController::class, 'update'])->name('news.update');
+
         Route::get('/assets', [AssetController::class, 'index'])->name('assets.index');
         Route::post('/assets', [AssetController::class, 'store'])->name('assets.store');
         Route::delete('/assets/{id}', [AssetController::class, 'destroy'])->name('assets.destroy');
+
+        Route::put('/announcement', [AnnouncementController::class, 'update'])->name('announcement.update');
     });
 });
 

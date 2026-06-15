@@ -5,10 +5,10 @@ import AdminLayout from '@/Layouts/AdminLayout';
 export default function MediaManager({ auth, assets = [] }) {
     const [showUploadForm, setShowUploadForm] = useState(false);
 
-    // Form setup for Admin direct upload
     const { data, setData, post, processing, errors, progress, reset } = useForm({
         contributor_name: '',
         email: '',
+        orgranization: '',
         title: '',
         category: 'Artworks',
         file: null,
@@ -60,6 +60,7 @@ export default function MediaManager({ auth, assets = [] }) {
                         )}
                     </button>
                 </div>
+
                 {showUploadForm && (
                     <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm mb-8 space-y-6">
                         <div className="border-b border-slate-100 dark:border-slate-700 pb-4 mb-4">
@@ -94,6 +95,18 @@ export default function MediaManager({ auth, assets = [] }) {
                                 {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                             </div>
 
+                            <div className="md:col-span-2">
+                                <label className="block text-xs font-semibold text-slate-500 mb-1">Organisasi / Organization</label>
+                                <input
+                                    type="text"
+                                    value={data.orgranization}
+                                    onChange={e => setData('orgranization', e.target.value)}
+                                    className="w-full px-4 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-transparent dark:text-white focus:ring-2 focus:ring-red-500 outline-none"
+                                    placeholder="Enter company, school, or organization name"
+                                />
+                                {errors.orgranization && <p className="text-red-500 text-xs mt-1">{errors.orgranization}</p>}
+                            </div>
+
                             <div>
                                 <label className="block text-xs font-semibold text-slate-500 mb-1">Tajuk Karya / Asset Title <span className="text-red-500">*</span></label>
                                 <input
@@ -123,7 +136,6 @@ export default function MediaManager({ auth, assets = [] }) {
                                 {errors.category && <p className="text-red-500 text-xs mt-1">{errors.category}</p>}
                             </div>
 
-
                             <div className="md:col-span-2">
                                 <label className="block text-xs font-semibold text-slate-500 mb-1">Fail / File Attachment <span className="text-red-500">*</span></label>
                                 <div className="border-2 border-dashed border-slate-200 dark:border-slate-600 rounded-xl p-4 text-center hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
@@ -138,7 +150,6 @@ export default function MediaManager({ auth, assets = [] }) {
                                 {errors.file && <p className="text-red-500 text-xs mt-1">{errors.file}</p>}
                             </div>
                         </div>
-
 
                         {progress && (
                             <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5 mt-4">
@@ -182,7 +193,7 @@ export default function MediaManager({ auth, assets = [] }) {
                                         ) : asset.category.toLowerCase() === 'pdf' ? (
                                             <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                         ) : (
-                                            <img src={`/storage/${asset.file_path}`} alt="Thumbnail" className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none'; }} />
+                                            <img src={asset.file_path?.startsWith('http') ? asset.file_path : `/storage/${asset.file_path}`} alt="Thumbnail" className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none'; }} />
                                         )}
                                     </div>
                                     <div className="absolute top-3 left-3 z-20">

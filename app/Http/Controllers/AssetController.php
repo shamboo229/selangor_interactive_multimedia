@@ -18,13 +18,7 @@ class AssetController extends Controller
         $publishedAssets = Asset::with('contributor')
             ->where('status', 'published')
             ->latest()
-            ->get()
-            ->map(function ($asset) {
-                if ($asset->file_path) {
-                    $asset->file_path = Storage::disk('s3')->url($asset->file_path);
-                }
-                return $asset;
-            });
+            ->get();
 
         return Inertia::render('Admin/MediaManager', [
             'assets' => $publishedAssets
@@ -43,14 +37,15 @@ class AssetController extends Controller
 
         $filePath = null;
         if ($request->hasFile('file')) {
-            $filePath = $request->file('file')->store('assets');
+            $filePath = $request->file('file')->store('assets', 'public');
         }
 
         $contributor = Contributor::firstOrCreate(
             ['email' => $request->email],
             [
-                'cont_name' => $request->contributor_name,
-                'password'  => Hash::make(Str::random(16))
+                'cont_name'     => $request->contributor_name,
+                'password'      => Hash::make(Str::random(16)),
+                'orgranization' => $request->orgranization,
             ]
         );
 
@@ -70,8 +65,8 @@ class AssetController extends Controller
     {
         $asset = Asset::findOrFail($id);
 
-        if ($asset->file_path && Storage::disk('s3')->exists($asset->file_path)) {
-            Storage::disk('s3')->delete($asset->file_path);
+        if ($asset->file_path && Storage::disk('public')->exists($asset->file_path)) {
+            Storage::disk('public')->delete($asset->file_path);
         }
 
         $asset->delete();
