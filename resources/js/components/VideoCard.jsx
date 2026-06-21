@@ -4,9 +4,8 @@ import Hls from 'hls.js';
 export default function VideoCard({ stream }) {
     const videoRef = useRef(null);
 
-    // 1. Defensively extract the raw data
     const isString = typeof stream === 'string';
-    let urlExtractor = isString ? stream : (stream?.stream_url || stream?.url || stream?.video_url || stream?.link || "");
+    let urlExtractor = isString ? stream : (stream?.stream_url || stream?.file_path || stream?.url || stream?.video_url || stream?.link || "");
 
     if (!urlExtractor && stream?.id) {
         urlExtractor = String(stream.id);
@@ -15,10 +14,8 @@ export default function VideoCard({ stream }) {
     const rawUrl = urlExtractor?.trim() || "";
     const lowerUrl = rawUrl.toLowerCase();
 
-    // 2. Identify HLS
     const isHlsStream = lowerUrl.includes('.m3u8');
 
-    // 3. Extract exact YouTube ID (whether it's a full link or just the 11-char ID)
     let ytId = null;
     if (rawUrl.length === 11 && !rawUrl.includes('.')) {
         ytId = rawUrl;
@@ -28,7 +25,6 @@ export default function VideoCard({ stream }) {
     }
     const isYouTube = !!ytId;
 
-    // 4. HLS strictly uses useEffect. YouTube no longer needs it.
     useEffect(() => {
         if (!rawUrl || !isHlsStream || !videoRef.current) return;
 
@@ -44,7 +40,7 @@ export default function VideoCard({ stream }) {
             hls.attachMedia(videoRef.current);
 
             hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                videoRef.current.play().catch(e => console.error("Autoplay blocked:", e));
+                videoRef.current.play().catch(e => console.error(e));
             });
 
             hls.on(Hls.Events.ERROR, (event, data) => {
@@ -82,7 +78,6 @@ export default function VideoCard({ stream }) {
                     <div className="lg:col-span-9">
                         <div className="relative aspect-video bg-black rounded-2xl overflow-hidden shadow-lg">
 
-                            {/* HLS Player (Archives) - Unchanged so it keeps working perfectly */}
                             {isHlsStream && (
                                 <video
                                     ref={videoRef}
@@ -94,7 +89,6 @@ export default function VideoCard({ stream }) {
                                 />
                             )}
 
-                            {/* NATIVE YOUTUBE IFRAME - Replaces ReactPlayer */}
                             {isYouTube && (
                                 <iframe
                                     className="w-full h-full absolute top-0 left-0"

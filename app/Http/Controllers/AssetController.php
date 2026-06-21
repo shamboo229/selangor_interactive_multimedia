@@ -62,15 +62,11 @@ class AssetController extends Controller
     }
 
     public function destroy($id)
-    {
-        $asset = Asset::findOrFail($id);
+        {
+            $asset = Asset::findOrFail($id);
 
-        if ($asset->file_path && Storage::disk('public')->exists($asset->file_path)) {
-            Storage::disk('public')->delete($asset->file_path);
+            $asset->delete();
+
+            return redirect()->back()->with('success', 'Karya kreatif berjaya dimasukkan ke dalam tong sampah.');
         }
-
-        $asset->delete();
-
-        return redirect()->back()->with('success', 'Asset deleted successfully.');
-    }
 }

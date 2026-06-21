@@ -2,23 +2,18 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Asset extends Model
 {
-    protected $primaryKey = 'asset_id';
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'title',
-        'category',
+        'file_path',
         'status',
         'cont_id',
-        'file_path',
-        'views',
     ];
-
-    public function contributor()
-    {
-        return $this->belongsTo(Contributor::class, 'cont_id', 'cont_id');
-    }
 }

@@ -44,14 +44,12 @@ export default function AdminLayout({ auth, children }) {
                         Media Manager
                     </Link>
 
-                    <div className="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4 mt-8">System</div>
-
                     <Link
-                        href="/admin/users"
-                        className={`flex items-center px-4 py-3 rounded-xl transition-all font-medium ${checkActive('/admin/users') ? 'bg-red-600/10 text-red-500 border border-red-500/10' : 'hover:bg-slate-800 hover:text-slate-100'}`}
+                        href="/admin/streams"
+                        className={`flex items-center px-4 py-3 rounded-xl transition-all font-medium ${checkActive('/admin/streams') ? 'bg-red-600/10 text-red-500 border border-red-500/10' : 'hover:bg-slate-800 hover:text-slate-100'}`}
                     >
                         <svg className={`w-5 h-5 mr-3 shrink-0 ${checkActive('/admin/users') ? '' : 'opacity-70'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                        Users & Roles
+                        Stream Archives Manager
                     </Link>
                 </nav>
 

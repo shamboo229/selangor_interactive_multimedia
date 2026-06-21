@@ -6,6 +6,7 @@ use App\Http\Controllers\NewsController;
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\PublicSubmissionController;
 use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\StreamsController;
 use App\Models\Stream;
 use App\Models\News;
 use App\Models\Announcement;
@@ -72,10 +73,16 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/news', [NewsController::class, 'index'])->name('news.index');
         Route::post('/news', [NewsController::class, 'store'])->name('news.store');
         Route::put('/news/{news}', [NewsController::class, 'update'])->name('news.update');
+        Route::delete('/news/{news}', [NewsController::class, 'destroy'])->name('news.destroy');
 
         Route::get('/assets', [AssetController::class, 'index'])->name('assets.index');
         Route::post('/assets', [AssetController::class, 'store'])->name('assets.store');
         Route::delete('/assets/{id}', [AssetController::class, 'destroy'])->name('assets.destroy');
+
+        Route::get('/streams', [StreamsController::class, 'index'])->name('streams.index');
+        Route::post('/streams', [StreamsController::class, 'store'])->name('streams.store');
+        Route::put('/streams/{id}', [StreamsController::class, 'update'])->name('streams.update');
+        Route::delete('/streams/{id}', [StreamsController::class, 'destroy'])->name('streams.destroy');
 
         Route::put('/announcement', [AnnouncementController::class, 'update'])->name('announcement.update');
     });
