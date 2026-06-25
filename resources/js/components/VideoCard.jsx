@@ -112,10 +112,10 @@ export default function VideoCard({ stream }) {
                         <span className="text-red-600 font-black text-[9px] uppercase tracking-[0.2em] bg-red-50 px-3 py-1 rounded-full w-fit">
                             {stream?.category || 'LIVE'}
                         </span>
-                        <h1 className="text-2xl font-black text-slate-900 uppercase leading-tight">
+                        <h1 className="text-2xl font-black text-white uppercase leading-tight">
                             {stream?.title || 'STREAMING'}
                         </h1>
-                        <p className="text-gray-600 text-sm leading-relaxed">
+                        <p className="text-white-600 text-sm leading-relaxed">
                             {stream?.description || 'Tiada deskripsi tersedia.'}
                         </p>
                     </div>

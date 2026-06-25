@@ -81,6 +81,7 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/streams', [StreamsController::class, 'index'])->name('streams.index');
         Route::post('/streams', [StreamsController::class, 'store'])->name('streams.store');
+        Route::get('/streams/{id}/edit', [StreamsController::class, 'edit'])->name('streams.edit');
         Route::put('/streams/{id}', [StreamsController::class, 'update'])->name('streams.update');
         Route::delete('/streams/{id}', [StreamsController::class, 'destroy'])->name('streams.destroy');
 

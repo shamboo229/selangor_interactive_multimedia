@@ -40,6 +40,15 @@ class StreamsController extends Controller
         return redirect()->back()->with('success', 'Stream archive added successfully!');
     }
 
+    public function edit($id)
+    {
+        $stream = Stream::findOrFail($id);
+
+        return Inertia::render('Admin/Streams/Edit', [
+            'stream' => $stream
+        ]);
+    }
+
     public function update(Request $request, $id)
     {
         $stream = Stream::findOrFail($id);
@@ -69,3 +78,4 @@ class StreamsController extends Controller
         return redirect()->back()->with('success', 'Stream archive deleted successfully.');
     }
 }
+    
