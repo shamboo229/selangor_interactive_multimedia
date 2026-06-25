@@ -24,7 +24,6 @@ This application is a Laravel application and its main Laravel ecosystems packag
 - pestphp/pest (PEST) - v3
 - phpunit/phpunit (PHPUNIT) - v11
 - \@inertiajs/react (INERTIA_REACT) - v2
-- react (REACT) - v18
 - tailwindcss (TAILWINDCSS) - v3
 - eslint (ESLINT) - v9
 - prettier (PRETTIER) - v3

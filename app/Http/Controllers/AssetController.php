@@ -18,7 +18,13 @@ class AssetController extends Controller
         $publishedAssets = Asset::with('contributor')
             ->where('status', 'published')
             ->latest()
-            ->get();
+            ->get()
+            ->map(function ($asset) {
+                $asset->cloud_url = $asset->file_path
+                    ? Storage::disk('supabase')->url($asset->file_path)
+                    : null;
+                return $asset;
+            });
 
         return Inertia::render('Admin/MediaManager', [
             'assets' => $publishedAssets
@@ -37,7 +43,7 @@ class AssetController extends Controller
 
         $filePath = null;
         if ($request->hasFile('file')) {
-            $filePath = $request->file('file')->store('assets', 'public');
+            $filePath = $request->file('file')->store('assets', 'supabase');
         }
 
         $contributor = Contributor::firstOrCreate(
@@ -58,15 +64,19 @@ class AssetController extends Controller
             'views'     => 0,
         ]);
 
-        return redirect()->back()->with('success', 'Asset uploaded successfully.');
+        return redirect()->back()->with('success', 'Asset uploaded successfully to Supabase.');
     }
 
     public function destroy($id)
-        {
-            $asset = Asset::findOrFail($id);
+    {
+        $asset = Asset::findOrFail($id);
 
-            $asset->delete();
-
-            return redirect()->back()->with('success', 'Karya kreatif berjaya dimasukkan ke dalam tong sampah.');
+        if ($asset->file_path && Storage::disk('supabase')->exists($asset->file_path)) {
+            Storage::disk('supabase')->delete($asset->file_path);
         }
+
+        $asset->delete();
+
+        return redirect()->back()->with('success', 'Karya kreatif dan fail awan berjaya dimasukkan ke dalam tong sampah.');
+    }
 }

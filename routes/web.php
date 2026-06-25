@@ -11,6 +11,7 @@ use App\Models\Stream;
 use App\Models\News;
 use App\Models\Announcement;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -68,6 +69,22 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name
 Route::middleware(['auth'])->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/', [AdminController::class, 'Dashboard'])->name('dashboard');
+
+        // Temporary test route to verify Supabase S3 connection
+        Route::get('/test-supabase', function () {
+            try {
+                $fileName = 'test-' . time() . '.txt';
+                Storage::disk('supabase')->put($fileName, 'Connected!');
+                if (Storage::disk('supabase')->exists($fileName)) {
+                    Storage::disk('supabase')->delete($fileName);
+                    return '🚀 Success! Connection established.';
+                }
+                return 'File uploaded but could not be located.';
+            } catch (\Exception $e) {
+                return 'Connection Failed: ' . $e->getMessage();
+            }
+        });
+
         Route::post('/update-stream', [AdminController::class, 'updateStream'])->name('stream.update');
 
         Route::get('/news', [NewsController::class, 'index'])->name('news.index');
