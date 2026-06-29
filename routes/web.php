@@ -70,7 +70,6 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/', [AdminController::class, 'Dashboard'])->name('dashboard');
 
-        // Temporary test route to verify Supabase S3 connection
         Route::get('/test-supabase', function () {
             try {
                 $fileName = 'test-' . time() . '.txt';
@@ -102,6 +101,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/streams/{id}', [StreamsController::class, 'update'])->name('streams.update');
         Route::delete('/streams/{id}', [StreamsController::class, 'destroy'])->name('streams.destroy');
 
+        Route::get('/announcement', [AnnouncementController::class, 'edit'])->name('announcement.edit');
         Route::put('/announcement', [AnnouncementController::class, 'update'])->name('announcement.update');
     });
 });

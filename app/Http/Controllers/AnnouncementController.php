@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Announcement;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class AnnouncementController extends Controller
@@ -23,10 +24,19 @@ class AnnouncementController extends Controller
             'content' => 'required|string|max:500',
         ]);
 
-        $announcement = Announcement::firstOrCreate([]);
-        $announcement->update([
-            'content' => $request->content
+        $adminId = Auth::id();
+
+        $announcement = Announcement::firstOrCreate([], [
+            'admin_id' => $adminId,
+            'content' => $request->content,
         ]);
+
+        if (!$announcement->wasRecentlyCreated) {
+            $announcement->update([
+                'admin_id' => $adminId,
+                'content' => $request->content
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Announcement updated successfully.');
     }
