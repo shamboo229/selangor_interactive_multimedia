@@ -60,6 +60,10 @@ class StreamsController extends Controller
             'is_active' => 'boolean',
         ]);
 
+        if ($request->boolean('is_active')) {
+            Stream::where('stream_id', '!=', $id)->update(['is_active' => false]);
+        }
+
         $stream->update([
             'title' => $validated['title'],
             'stream_url' => $validated['stream_url'],
@@ -78,4 +82,3 @@ class StreamsController extends Controller
         return redirect()->back()->with('success', 'Stream archive deleted successfully.');
     }
 }
-    

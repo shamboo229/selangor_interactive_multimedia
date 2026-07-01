@@ -4,8 +4,9 @@ import AdminLayout from '@/Layouts/AdminLayout';
 
 export default function StreamsIndex({ auth, streams = [] }) {
     const [searchQuery, setSearchQuery] = useState('');
-
     const [editingStream, setEditingStream] = useState(null);
+
+    const currentActiveStream = streams.find(s => s.is_active == 1 || s.is_active === true);
 
     const { data, setData, put, processing, errors, reset, clearErrors } = useForm({
         title: '',
@@ -35,6 +36,14 @@ export default function StreamsIndex({ auth, streams = [] }) {
         e.preventDefault();
 
         const streamId = editingStream.id || editingStream.stream_id || editingStream.id_stream;
+
+        if (data.is_active && currentActiveStream && currentActiveStream.id !== streamId) {
+            const confirmOverride = confirm(
+                `Amaran: Aliran "${currentActiveStream.title}" sedang aktif sekarang. Adakah anda pasti untuk menukarnya kepada aliran baru ini?`
+            );
+            if (!confirmOverride) return;
+        }
+
         const updateUrl = typeof route !== 'undefined'
             ? route('admin.streams.update', streamId)
             : `/admin/streams/${streamId}`;
@@ -243,17 +252,24 @@ export default function StreamsIndex({ auth, streams = [] }) {
                                     {errors.description && <div className="text-red-500 text-xs mt-1">{errors.description}</div>}
                                 </div>
 
-                                <div className="flex items-center gap-2 pt-2">
-                                    <input
-                                        type="checkbox"
-                                        id="is_active"
-                                        checked={data.is_active}
-                                        onChange={(e) => setData('is_active', e.target.checked)}
-                                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                                    />
-                                    <label htmlFor="is_active" className="text-sm text-slate-700 cursor-pointer">
-                                        Set as Active Live Stream
-                                    </label>
+                                <div className="flex flex-col gap-1 pt-2">
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            type="checkbox"
+                                            id="is_active"
+                                            checked={data.is_active}
+                                            onChange={(e) => setData('is_active', e.target.checked)}
+                                            className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                        />
+                                        <label htmlFor="is_active" className="text-sm text-slate-700 cursor-pointer font-medium">
+                                            Set as Active Live Stream
+                                        </label>
+                                    </div>
+                                    {data.is_active && currentActiveStream && currentActiveStream.id !== (editingStream.id || editingStream.stream_id || editingStream.id_stream) && (
+                                        <p className="text-amber-600 text-xs pl-6 font-semibold">
+                                            Nota: Menyimpan akan menukar status "${currentActiveStream.title}" kepada Arkib secara automatik.
+                                        </p>
+                                    )}
                                 </div>
                             </form>
                         </div>
