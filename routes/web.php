@@ -12,9 +12,17 @@ use App\Models\News;
 use App\Models\Announcement;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
 Route::get('/', function () {
+    $activeUsers = Cache::get('active_users_tracker', []);
+    $activeUsers[session()->getId()] = now()->timestamp;
+    $activeUsers = array_filter($activeUsers, function ($timestamp) {
+        return $timestamp > now()->subMinutes(3)->timestamp;
+    });
+    Cache::forever('active_users_tracker', $activeUsers);
+
     $stream = Stream::where('is_active', true)->latest()->first();
     $latestNews = News::orderBy('publish_date', 'desc')->take(3)->get();
 
@@ -41,6 +49,13 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/berita', function () {
+    $activeUsers = Cache::get('active_users_tracker', []);
+    $activeUsers[session()->getId()] = now()->timestamp;
+    $activeUsers = array_filter($activeUsers, function ($timestamp) {
+        return $timestamp > now()->subMinutes(3)->timestamp;
+    });
+    Cache::forever('active_users_tracker', $activeUsers);
+
     $news = News::orderBy('publish_date', 'desc')->get();
 
     return Inertia::render('InfoSemasa', [
@@ -49,6 +64,13 @@ Route::get('/berita', function () {
 })->name('berita');
 
 Route::get('/karya', function () {
+    $activeUsers = Cache::get('active_users_tracker', []);
+    $activeUsers[session()->getId()] = now()->timestamp;
+    $activeUsers = array_filter($activeUsers, function ($timestamp) {
+        return $timestamp > now()->subMinutes(3)->timestamp;
+    });
+    Cache::forever('active_users_tracker', $activeUsers);
+
     $assets = \App\Models\Asset::where('status', '!=', 'unpublished')->latest()->get();
 
     return Inertia::render('KaryaKreatif', [
@@ -57,6 +79,13 @@ Route::get('/karya', function () {
 })->name('karya');
 
 Route::get('/arkib', function () {
+    $activeUsers = Cache::get('active_users_tracker', []);
+    $activeUsers[session()->getId()] = now()->timestamp;
+    $activeUsers = array_filter($activeUsers, function ($timestamp) {
+        return $timestamp > now()->subMinutes(3)->timestamp;
+    });
+    Cache::forever('active_users_tracker', $activeUsers);
+
     return Inertia::render('ArkibDigital', [
         'archiveVideos' => Stream::where('is_active', false)->latest()->get(),
     ]);
@@ -76,7 +105,7 @@ Route::middleware(['auth'])->group(function () {
                 Storage::disk('supabase')->put($fileName, 'Connected!');
                 if (Storage::disk('supabase')->exists($fileName)) {
                     Storage::disk('supabase')->delete($fileName);
-                    return '🚀 Success! Connection established.';
+                    return 'Success! Connection established.';
                 }
                 return 'File uploaded but could not be located.';
             } catch (\Exception $e) {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use App\Models\Stream;
 use App\Models\News;
@@ -14,6 +15,12 @@ class AdminController extends Controller
 {
     public function Dashboard()
     {
+        $activeUsers = Cache::get('active_users_tracker', []);
+        $activeUsers = array_filter($activeUsers, function ($timestamp) {
+            return $timestamp > now()->subMinutes(3)->timestamp;
+        });
+        Cache::forever('active_users_tracker', $activeUsers);
+
         $activeStream = Stream::where('is_active', true)->first();
 
         return Inertia::render('Admin/Dashboard', [
@@ -23,6 +30,7 @@ class AdminController extends Controller
                 'description' => $activeStream->description ?? '',
             ],
             'stats' => [
+                'liveHits'       => count($activeUsers),
                 'news'           => News::count(),
                 'assets'         => Asset::count(),
                 'streamArchives' => Stream::count(),

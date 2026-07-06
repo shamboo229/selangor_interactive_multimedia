@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import VideoCard from '@/Components/VideoCard';
 
@@ -26,6 +26,18 @@ export default function Dashboard({ auth, currentStream, stats = {}, announcemen
             description: currentStream?.description || '',
         });
     }, [currentStream]);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            router.reload({
+                only: ['stats'],
+                preserveState: true,
+                preserveScroll: true
+            });
+        }, 10000);
+
+        return () => clearInterval(interval);
+    }, []);
 
     const submitLiveUpdate = (e) => {
         e.preventDefault();
@@ -59,9 +71,34 @@ export default function Dashboard({ auth, currentStream, stats = {}, announcemen
             <Head title="Dashboard - SIM Workspace" />
 
             <div className="max-w-7xl mx-auto space-y-8">
-                <h1 className="text-2xl font-bold text-slate-800 tracking-tight">System Overview</h1>
+                <div className="flex items-center justify-between">
+                    <h1 className="text-2xl font-bold text-slate-800 tracking-tight">System Overview</h1>
+                    <div className="flex items-center gap-2 text-sm font-medium text-slate-500">
+                        <span className="relative flex h-3 w-3">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                        </span>
+                        Live Sync Active
+                    </div>
+                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <h3 className="text-slate-500 text-sm font-medium">Live Page Hits</h3>
+                                <p className="text-3xl font-bold text-slate-800 mt-2">{stats.liveHits || 0}</p>
+                            </div>
+                            <div className="p-3 bg-red-50 text-red-600 rounded-xl">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div className="absolute -bottom-1 -right-1 w-24 h-24 bg-red-50 rounded-full blur-2xl animate-pulse -z-10"></div>
+                    </div>
+
                     <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                         <div className="flex justify-between items-start">
                             <div>
