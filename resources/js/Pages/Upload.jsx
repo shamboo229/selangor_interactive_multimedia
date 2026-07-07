@@ -1,5 +1,5 @@
 import React from 'react';
-import MultimediaLayout from '@/Layouts/multimedialayout'; // Adjust path if needed
+import MultimediaLayout from '@/Layouts/MultimediaLayout'; // Adjust path if needed
 import { useForm } from '@inertiajs/react';
 
 const Upload = () => {
