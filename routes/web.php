@@ -5,12 +5,24 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\PublicSubmissionController;
+use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\StreamsController;
 use App\Models\Stream;
 use App\Models\News;
+use App\Models\Announcement;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
 Route::get('/', function () {
+    $activeUsers = Cache::get('active_users_tracker', []);
+    $activeUsers[session()->getId()] = now()->timestamp;
+    $activeUsers = array_filter($activeUsers, function ($timestamp) {
+        return $timestamp > now()->subMinutes(3)->timestamp;
+    });
+    Cache::forever('active_users_tracker', $activeUsers);
+
     $stream = Stream::where('is_active', true)->latest()->first();
     $latestNews = News::orderBy('publish_date', 'desc')->take(3)->get();
 
@@ -18,6 +30,8 @@ Route::get('/', function () {
                                      ->latest()
                                      ->take(4)
                                      ->get();
+
+    $announcement = Announcement::first();
 
     return Inertia::render('Home', [
         'featuredLive' => [
@@ -30,10 +44,18 @@ Route::get('/', function () {
         'archiveVideos' => Stream::where('is_active', false)->latest()->take(4)->get(),
         'latestNews'    => $latestNews,
         'latestAssets'  => $latestAssets,
+        'announcementText' => $announcement ? $announcement->content : 'Selamat Datang ke SIM Workspace!',
     ]);
 })->name('home');
 
 Route::get('/berita', function () {
+    $activeUsers = Cache::get('active_users_tracker', []);
+    $activeUsers[session()->getId()] = now()->timestamp;
+    $activeUsers = array_filter($activeUsers, function ($timestamp) {
+        return $timestamp > now()->subMinutes(3)->timestamp;
+    });
+    Cache::forever('active_users_tracker', $activeUsers);
+
     $news = News::orderBy('publish_date', 'desc')->get();
 
     return Inertia::render('InfoSemasa', [
@@ -42,6 +64,13 @@ Route::get('/berita', function () {
 })->name('berita');
 
 Route::get('/karya', function () {
+    $activeUsers = Cache::get('active_users_tracker', []);
+    $activeUsers[session()->getId()] = now()->timestamp;
+    $activeUsers = array_filter($activeUsers, function ($timestamp) {
+        return $timestamp > now()->subMinutes(3)->timestamp;
+    });
+    Cache::forever('active_users_tracker', $activeUsers);
+
     $assets = \App\Models\Asset::where('status', '!=', 'unpublished')->latest()->get();
 
     return Inertia::render('KaryaKreatif', [
@@ -50,6 +79,13 @@ Route::get('/karya', function () {
 })->name('karya');
 
 Route::get('/arkib', function () {
+    $activeUsers = Cache::get('active_users_tracker', []);
+    $activeUsers[session()->getId()] = now()->timestamp;
+    $activeUsers = array_filter($activeUsers, function ($timestamp) {
+        return $timestamp > now()->subMinutes(3)->timestamp;
+    });
+    Cache::forever('active_users_tracker', $activeUsers);
+
     return Inertia::render('ArkibDigital', [
         'archiveVideos' => Stream::where('is_active', false)->latest()->get(),
     ]);
@@ -62,13 +98,40 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name
 Route::middleware(['auth'])->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/', [AdminController::class, 'Dashboard'])->name('dashboard');
+
+        Route::get('/test-supabase', function () {
+            try {
+                $fileName = 'test-' . time() . '.txt';
+                Storage::disk('supabase')->put($fileName, 'Connected!');
+                if (Storage::disk('supabase')->exists($fileName)) {
+                    Storage::disk('supabase')->delete($fileName);
+                    return 'Success! Connection established.';
+                }
+                return 'File uploaded but could not be located.';
+            } catch (\Exception $e) {
+                return 'Connection Failed: ' . $e->getMessage();
+            }
+        });
+
         Route::post('/update-stream', [AdminController::class, 'updateStream'])->name('stream.update');
+
         Route::get('/news', [NewsController::class, 'index'])->name('news.index');
         Route::post('/news', [NewsController::class, 'store'])->name('news.store');
         Route::put('/news/{news}', [NewsController::class, 'update'])->name('news.update');
+        Route::delete('/news/{news}', [NewsController::class, 'destroy'])->name('news.destroy');
+
         Route::get('/assets', [AssetController::class, 'index'])->name('assets.index');
         Route::post('/assets', [AssetController::class, 'store'])->name('assets.store');
         Route::delete('/assets/{id}', [AssetController::class, 'destroy'])->name('assets.destroy');
+
+        Route::get('/streams', [StreamsController::class, 'index'])->name('streams.index');
+        Route::post('/streams', [StreamsController::class, 'store'])->name('streams.store');
+        Route::get('/streams/{id}/edit', [StreamsController::class, 'edit'])->name('streams.edit');
+        Route::put('/streams/{id}', [StreamsController::class, 'update'])->name('streams.update');
+        Route::delete('/streams/{id}', [StreamsController::class, 'destroy'])->name('streams.destroy');
+
+        Route::get('/announcement', [AnnouncementController::class, 'edit'])->name('announcement.edit');
+        Route::put('/announcement', [AnnouncementController::class, 'update'])->name('announcement.update');
     });
 });
 

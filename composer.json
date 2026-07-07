@@ -14,6 +14,7 @@
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
+        "league/flysystem-aws-s3-v3": "^3.34",
         "tightenco/ziggy": "^2.0"
     },
     "require-dev": {
@@ -74,6 +75,10 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
+        },
+        "audit": {
+            "ignore": ["PKSA-3r5d-mb8f-1qw9", "PKSA-m5cs-t1y6-qpcs", "PKSA-mdq4-51ck-6kdq", "PKSA-93qv-9n9h-6k6p", "PKSA-k22t-f949-t9g6"],
+            "block-insecure": true
         }
     },
     "minimum-stability": "dev",

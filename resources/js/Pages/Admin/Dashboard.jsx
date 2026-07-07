@@ -1,28 +1,54 @@
-import React, { useEffect, useRef } from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import React, { useEffect } from 'react';
+import { Head, useForm, router } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
-import Hls from 'hls.js';
+import VideoCard from '@/Components/VideoCard';
 
-export default function Dashboard({ auth, currentStream, stats = {} }) {
-    const videoRef = useRef(null);
-
+export default function Dashboard({ auth, currentStream, stats = {}, announcementText = '' }) {
     const { data, setData, post, processing } = useForm({
         title: currentStream?.title || '',
-        url: currentStream?.url || '',
+        url: currentStream?.stream_url || currentStream?.url || '',
         description: currentStream?.description || '',
+    });
+
+    const {
+        data: announcementData,
+        setData: setAnnouncementData,
+        put: putAnnouncement,
+        processing: processingAnnouncement
+    } = useForm({
+        content: announcementText,
     });
 
     useEffect(() => {
         setData({
             title: currentStream?.title || '',
-            url: currentStream?.url || '',
+            url: currentStream?.stream_url || currentStream?.url || '',
             description: currentStream?.description || '',
         });
     }, [currentStream]);
 
+    useEffect(() => {
+        const interval = setInterval(() => {
+            router.reload({
+                only: ['stats'],
+                preserveState: true,
+                preserveScroll: true
+            });
+        }, 10000);
+
+        return () => clearInterval(interval);
+    }, []);
+
     const submitLiveUpdate = (e) => {
         e.preventDefault();
         post(route('admin.stream.update'), {
+            preserveScroll: true,
+        });
+    };
+
+    const submitAnnouncement = (e) => {
+        e.preventDefault();
+        putAnnouncement(route('admin.announcement.update'), {
             preserveScroll: true,
         });
     };
@@ -40,54 +66,39 @@ export default function Dashboard({ auth, currentStream, stats = {} }) {
         setData('url', input);
     };
 
-    const rawUrl = data.url?.trim() || "";
-    const lowerUrl = rawUrl.toLowerCase();
-
-    const isHlsStream = lowerUrl.includes('.m3u8');
-
-    let ytId = null;
-    if (rawUrl.length === 11 && !rawUrl.includes('.')) {
-        ytId = rawUrl;
-    } else if (lowerUrl.includes('youtube.com') || lowerUrl.includes('youtu.be')) {
-        const match = rawUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=|live\/|shorts\/))([^"&?\/\s]{11})/);
-        if (match && match[1]) ytId = match[1];
-    }
-    const isYouTube = !!ytId;
-
-    useEffect(() => {
-        if (!rawUrl || !isHlsStream || !videoRef.current) return;
-
-        let hls;
-
-        if (Hls.isSupported()) {
-            hls = new Hls({
-                enableWorker: true,
-                lowLatencyMode: true,
-            });
-
-            hls.loadSource(rawUrl);
-            hls.attachMedia(videoRef.current);
-
-            hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                videoRef.current.play().catch(e => console.error("Admin Autoplay blocked:", e));
-            });
-        } else if (videoRef.current.canPlayType('application/vnd.apple.mpegurl')) {
-            videoRef.current.src = rawUrl;
-        }
-
-        return () => {
-            if (hls) hls.destroy();
-        };
-    }, [rawUrl, isHlsStream]);
-
     return (
         <AdminLayout auth={auth}>
             <Head title="Dashboard - SIM Workspace" />
 
             <div className="max-w-7xl mx-auto space-y-8">
-                <h1 className="text-2xl font-bold text-slate-800 tracking-tight">System Overview</h1>
+                <div className="flex items-center justify-between">
+                    <h1 className="text-2xl font-bold text-slate-800 tracking-tight">System Overview</h1>
+                    <div className="flex items-center gap-2 text-sm font-medium text-slate-500">
+                        <span className="relative flex h-3 w-3">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                        </span>
+                        Live Sync Active
+                    </div>
+                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <h3 className="text-slate-500 text-sm font-medium">Live Page Hits</h3>
+                                <p className="text-3xl font-bold text-slate-800 mt-2">{stats.liveHits || 0}</p>
+                            </div>
+                            <div className="p-3 bg-red-50 text-red-600 rounded-xl">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div className="absolute -bottom-1 -right-1 w-24 h-24 bg-red-50 rounded-full blur-2xl animate-pulse -z-10"></div>
+                    </div>
+
                     <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                         <div className="flex justify-between items-start">
                             <div>
@@ -131,6 +142,33 @@ export default function Dashboard({ auth, currentStream, stats = {} }) {
                     </div>
                 </div>
 
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+                        <h2 className="text-base font-bold text-slate-800">Live Announcement Banner</h2>
+                        <span className="bg-red-50 text-red-600 text-xs px-3 py-1 rounded-full font-semibold">Global Banner</span>
+                    </div>
+                    <div className="p-6">
+                        <form onSubmit={submitAnnouncement} className="flex flex-col sm:flex-row gap-4 items-end">
+                            <div className="flex-1 w-full">
+                                <label className="block text-sm font-semibold text-slate-700 mb-2">Scrolling Text Content</label>
+                                <input
+                                    value={announcementData.content}
+                                    onChange={e => setAnnouncementData('content', e.target.value)}
+                                    className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-4 focus:ring-red-500/10 focus:border-red-500 block p-3.5 outline-none"
+                                    placeholder="e.g., Daftar Skim Mesra Usia Emas (SMUE) di portal rasmi..."
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={processingAnnouncement || !announcementData.content}
+                                className="w-full sm:w-auto text-white bg-slate-800 hover:bg-slate-900 disabled:bg-slate-300 font-bold rounded-xl text-sm px-8 py-3.5 transition-all h-[52px]"
+                            >
+                                {processingAnnouncement ? 'Updating...' : 'Update Banner'}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
                 <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
                     <div className="xl:col-span-2">
                         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden h-full flex flex-col">
@@ -139,37 +177,8 @@ export default function Dashboard({ auth, currentStream, stats = {} }) {
                                 <span className="bg-slate-100 text-slate-500 text-xs px-3 py-1 rounded-full font-semibold">Live Module</span>
                             </div>
                             <div className="p-6 flex-1 flex flex-col justify-center bg-slate-50/50">
-                                <div className="relative aspect-[16/9] w-full bg-[#0b1121] rounded-xl overflow-hidden shadow-inner ring-1 ring-slate-900/5">
-                                    {isHlsStream && (
-                                        <video
-                                            ref={videoRef}
-                                            controls
-                                            muted
-                                            autoPlay
-                                            playsInline
-                                            className="w-full h-full absolute top-0 left-0 object-contain"
-                                        />
-                                    )}
-
-                                    {isYouTube && (
-                                        <iframe
-                                            className="w-full h-full absolute top-0 left-0"
-                                            src={`https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&playsinline=1`}
-                                            title="YouTube Preview"
-                                            frameBorder="0"
-                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                            allowFullScreen
-                                        ></iframe>
-                                    )}
-
-                                    {!isHlsStream && !isYouTube && (
-                                        <div className="flex flex-col items-center justify-center w-full h-full text-slate-500">
-                                            <svg className="w-12 h-12 mb-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                                            </svg>
-                                            <p className="font-medium text-sm">No valid broadcast source detected</p>
-                                        </div>
-                                    )}
+                                <div className="w-full rounded-xl overflow-hidden [&_section]:p-0 [&_section]:py-0 [&_div.max-w-\\[1800px\\]]:p-0 [&_div.max-w-\\[1800px\\]]:border-0 [&_div.max-w-\\[1800px\\]]:shadow-none [&_div.max-w-\\[1800px\\]]:bg-transparent [&_div.lg\\:col-span-3]:hidden [&_div.grid]:grid-cols-1">
+                                    <VideoCard stream={{ stream_url: data.url }} />
                                 </div>
                             </div>
                         </div>
@@ -198,7 +207,7 @@ export default function Dashboard({ auth, currentStream, stats = {} }) {
                                             value={data.url || ''}
                                             onChange={handleUrlChange}
                                             className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-4 focus:ring-red-500/10 focus:border-red-500 block p-3.5 font-mono outline-none"
-                                            placeholder="http://.../mystream.m3u8 or YouTube URL"
+                                            placeholder="http://.../mystream.m3u8, rtmp://..., or YouTube URL"
                                         />
                                     </div>
 

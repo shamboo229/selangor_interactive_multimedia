@@ -6,20 +6,9 @@ import ArchiveGrid from '@/Components/ArchiveGrid';
 import AssetsGrid from '@/Components/AssetsGrid';
 import { Head, Link } from '@inertiajs/react';
 
-export default function Home({ auth, featuredLive, archiveVideos, latestNews = [], latestAssets = [] }) {
-    const actualLiveData = Array.isArray(featuredLive) ? featuredLive[0] : featuredLive;
-    const liveData = actualLiveData || {};
-    const videos = archiveVideos || [];
-    const hasActiveStream = liveData.stream_url || liveData.url || liveData.stream_id || liveData.id;
-
-    // Optional: Inject demo assets if database is completely empty so you can visualize it on Home
-    const demoAssets = [
-        { asset_id: 1, category: 'Artworks', views: 3420, file_path: 'demo-art.jpg' },
-        { asset_id: 2, category: 'Posters', views: 1205, file_path: 'demo-poster.jpg' },
-        { asset_id: 3, category: 'Videos', views: 8900, file_path: 'demo-video.mp4' },
-        { asset_id: 4, category: 'Animations', views: 450, file_path: 'demo-anim.mp4' }
-    ];
-    const displayAssets = latestAssets && latestAssets.length > 0 ? latestAssets : demoAssets;
+export default function Home({ auth, featuredLive, archiveVideos = [], latestNews = [], latestAssets = [], announcementText = '' }) {
+    const liveData = (Array.isArray(featuredLive) ? featuredLive[0] : featuredLive) || {};
+    const hasActiveStream = Boolean(liveData.stream_url || liveData.url || liveData.stream_id || liveData.id);
 
     return (
         <MultimediaLayout auth={auth}>
@@ -30,9 +19,7 @@ export default function Home({ auth, featuredLive, archiveVideos, latestNews = [
                     PENGUMUMAN
                 </div>
                 <marquee className="text-sm font-bold tracking-wide uppercase">
-                    • {(liveData.is_active === true || liveData.is_active === 't' || liveData.is_active === 1) ? `${liveData.title} sedang berlangsung • ` : ''}
-                    Daftar Skim Mesra Usia Emas (SMUE) di portal rasmi •
-                    Pantau amaran cuaca di media sosial rasmi Kerajaan Negeri •
+                    • {announcementText}
                 </marquee>
             </div>
 
@@ -77,7 +64,7 @@ export default function Home({ auth, featuredLive, archiveVideos, latestNews = [
                     </Link>
                 </div>
 
-                <ArchiveGrid videos={videos} />
+                <ArchiveGrid videos={archiveVideos} />
             </section>
 
             <section className="mt-16 mb-16 px-4 md:px-8 max-w-[1800px] mx-auto">
@@ -92,7 +79,7 @@ export default function Home({ auth, featuredLive, archiveVideos, latestNews = [
                     </Link>
                 </div>
 
-                <AssetsGrid assets={displayAssets} />
+                <AssetsGrid assets={latestAssets} />
             </section>
         </MultimediaLayout>
     );

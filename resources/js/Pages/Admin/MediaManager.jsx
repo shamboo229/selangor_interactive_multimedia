@@ -4,11 +4,12 @@ import AdminLayout from '@/Layouts/AdminLayout';
 
 export default function MediaManager({ auth, assets = [] }) {
     const [showUploadForm, setShowUploadForm] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
 
-    // Form setup for Admin direct upload
     const { data, setData, post, processing, errors, progress, reset } = useForm({
         contributor_name: '',
         email: '',
+        orgranization: '',
         title: '',
         category: 'Artworks',
         file: null,
@@ -32,36 +33,74 @@ export default function MediaManager({ auth, assets = [] }) {
         }
     };
 
+    const filteredAssets = assets.filter((asset) => {
+        const query = searchQuery.toLowerCase();
+        return (
+            (asset.title && asset.title.toLowerCase().includes(query)) ||
+            (asset.category && asset.category.toLowerCase().includes(query)) ||
+            (asset.contributor_name && asset.contributor_name.toLowerCase().includes(query)) ||
+            (asset.file_path && asset.file_path.toLowerCase().includes(query))
+        );
+    });
+
     return (
         <AdminLayout auth={auth}>
             <Head title="Media Manager - SIM Workspace" />
 
             <div className="max-w-7xl mx-auto space-y-6">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-slate-200 dark:border-slate-700 pb-6">
+                <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">Pengurusan Media (Media Manager)</h1>
-                        <p className="text-sm text-slate-500 mt-1">Manage public library assets and upload community submissions.</p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage public library assets and upload community submissions.</p>
                     </div>
 
-                    <button
-                        onClick={() => setShowUploadForm(!showUploadForm)}
-                        className={`${showUploadForm ? 'bg-slate-500 hover:bg-slate-600' : 'bg-red-600 hover:bg-red-700 shadow-red-500/20 shadow-lg'} text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2`}
-                    >
-                        {showUploadForm ? (
-                            <>
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                Cancel Upload
-                            </>
-                        ) : (
-                            <>
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
-                                Upload Asset
-                            </>
-                        )}
-                    </button>
+                    <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                        <div className="relative w-full sm:w-72 shrink-0">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Cari tajuk, kategori, atau penyumbang..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-500 transition-all text-slate-800 dark:text-white placeholder-slate-400"
+                            />
+                            {searchQuery && (
+                                <button
+                                    onClick={() => setSearchQuery('')}
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                                >
+                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            )}
+                        </div>
+
+                        <button
+                            onClick={() => setShowUploadForm(!showUploadForm)}
+                            className={`${showUploadForm ? 'bg-slate-500 hover:bg-slate-600' : 'bg-red-600 hover:bg-red-700 shadow-lg shadow-red-500/20'} text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all w-full sm:w-auto whitespace-nowrap flex items-center justify-center gap-2`}
+                        >
+                            {showUploadForm ? (
+                                <>
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                    Cancel Upload
+                                </>
+                            ) : (
+                                <>
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
+                                    Upload Asset
+                                </>
+                            )}
+                        </button>
+                    </div>
                 </div>
+
                 {showUploadForm && (
-                    <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm mb-8 space-y-6">
+                    <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-6">
                         <div className="border-b border-slate-100 dark:border-slate-700 pb-4 mb-4">
                             <h3 className="text-lg font-bold text-slate-800 dark:text-white">Muat Naik Karya Baru</h3>
                             <p className="text-sm text-slate-500">Assets uploaded here bypass the review process and are published immediately.</p>
@@ -94,6 +133,18 @@ export default function MediaManager({ auth, assets = [] }) {
                                 {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                             </div>
 
+                            <div className="md:col-span-2">
+                                <label className="block text-xs font-semibold text-slate-500 mb-1">Organisasi / Organization</label>
+                                <input
+                                    type="text"
+                                    value={data.orgranization}
+                                    onChange={e => setData('orgranization', e.target.value)}
+                                    className="w-full px-4 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-transparent dark:text-white focus:ring-2 focus:ring-red-500 outline-none"
+                                    placeholder="Enter company, school, or organization name"
+                                />
+                                {errors.orgranization && <p className="text-red-500 text-xs mt-1">{errors.orgranization}</p>}
+                            </div>
+
                             <div>
                                 <label className="block text-xs font-semibold text-slate-500 mb-1">Tajuk Karya / Asset Title <span className="text-red-500">*</span></label>
                                 <input
@@ -123,7 +174,6 @@ export default function MediaManager({ auth, assets = [] }) {
                                 {errors.category && <p className="text-red-500 text-xs mt-1">{errors.category}</p>}
                             </div>
 
-
                             <div className="md:col-span-2">
                                 <label className="block text-xs font-semibold text-slate-500 mb-1">Fail / File Attachment <span className="text-red-500">*</span></label>
                                 <div className="border-2 border-dashed border-slate-200 dark:border-slate-600 rounded-xl p-4 text-center hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
@@ -138,7 +188,6 @@ export default function MediaManager({ auth, assets = [] }) {
                                 {errors.file && <p className="text-red-500 text-xs mt-1">{errors.file}</p>}
                             </div>
                         </div>
-
 
                         {progress && (
                             <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5 mt-4">
@@ -159,15 +208,21 @@ export default function MediaManager({ auth, assets = [] }) {
                     </form>
                 )}
 
-                {assets.length === 0 ? (
+                {filteredAssets.length === 0 ? (
                     <div className="text-center py-24 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 border-dashed">
                         <svg className="w-16 h-16 mx-auto text-slate-300 dark:text-slate-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300">No media found</h3>
-                        <p className="text-slate-500 text-sm mt-1">Upload your first image, video, or document using the button above.</p>
+                        <h3 className="text-lg font-bold text-slate-700 dark:text-slate-300">
+                            {assets.length === 0 ? 'No media found' : 'No results match your search'}
+                        </h3>
+                        <p className="text-slate-500 text-sm mt-1">
+                            {assets.length === 0
+                                ? 'Upload your first image, video, or document using the button above.'
+                                : 'Try checking your spelling or search using a different keyword.'}
+                        </p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        {assets.map((asset) => (
+                        {filteredAssets.map((asset) => (
                             <div key={asset.asset_id} className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden group hover:shadow-md transition-shadow">
                                 <div className="aspect-square bg-slate-100 dark:bg-slate-900 relative">
                                     <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity z-20 flex items-center justify-center gap-3 backdrop-blur-sm">
@@ -182,7 +237,7 @@ export default function MediaManager({ auth, assets = [] }) {
                                         ) : asset.category.toLowerCase() === 'pdf' ? (
                                             <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                         ) : (
-                                            <img src={`/storage/${asset.file_path}`} alt="Thumbnail" className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none'; }} />
+                                            <img src={asset.cloud_url || (asset.file_path?.startsWith('http') ? asset.file_path : `/storage/${asset.file_path}`)} alt="Thumbnail" className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none'; }} />
                                         )}
                                     </div>
                                     <div className="absolute top-3 left-3 z-20">
@@ -194,7 +249,7 @@ export default function MediaManager({ auth, assets = [] }) {
 
                                 <div className="p-4 border-t border-slate-100 dark:border-slate-700">
                                     <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate" title={asset.title || asset.file_path}>
-                                        {asset.title || asset.file_path.split('/').pop()}
+                                        {asset.title || asset.file_path?.split('/').pop()}
                                     </p>
                                     <div className="flex justify-between items-center mt-2">
                                         <p className="text-xs text-slate-500 dark:text-slate-400 font-medium bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded">

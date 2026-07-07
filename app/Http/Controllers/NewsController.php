@@ -68,4 +68,12 @@ class NewsController extends Controller
 
         return redirect()->back()->with('success', 'News updated successfully!');
     }
+
+    public function destroy($id)
+    {
+        $news = News::findOrFail($id);
+        $news->delete();
+
+        return redirect()->back()->with('success', 'Berita berjaya dimasukkan ke dalam tong sampah.');
+    }
 }

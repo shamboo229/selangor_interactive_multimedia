@@ -2,19 +2,27 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Asset extends Model
 {
-    // Tell Laravel to look for 'asset_id' instead of 'id'
     protected $primaryKey = 'asset_id';
+    use HasFactory, SoftDeletes;
 
-    // Allow these fields to be filled during upload
-    protected $fillable = ['cont_id', 'title', 'category', 'status', 'file_path', 'views'];
+    protected $fillable = [
+        'title',
+        'category',
+        'file_path',
+        'status',
+        'cont_id',
+        'views',
+    ];
 
-    // This creates the link to the Contributor
-    public function contributor()
+    public function contributor(): BelongsTo
     {
-        return $this->belongsTo(Contributor::class, 'cont_id', 'cont_id');
+        return $this->belongsTo(Contributor::class, 'cont_id');
     }
 }

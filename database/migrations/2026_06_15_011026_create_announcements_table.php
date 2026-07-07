@@ -1,0 +1,36 @@
+    <?php
+
+    use Illuminate\Database\Migrations\Migration;
+    use Illuminate\Database\Schema\Blueprint;
+    use Illuminate\Support\Facades\Schema;
+    use Illuminate\Support\Facades\DB;
+
+    return new class extends Migration
+    {
+        public function up(): void
+        {
+            Schema::create('announcements', function (Blueprint $table) {
+                $table->id();
+
+                $table->foreignId('admin_id')
+                      ->constrained('admins', 'admin_id')
+                      ->onDelete('cascade');
+
+                $table->text('content');
+                $table->boolean('is_active')->default(true);
+                $table->timestamps();
+            });
+
+            DB::table('announcements')->insert([
+                'admin_id'   => 1,
+                'content'    => 'Selamat Datang ke SIM Workspace!',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        public function down(): void
+        {
+            Schema::dropIfExists('announcements');
+        }
+    };

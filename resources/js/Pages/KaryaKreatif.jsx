@@ -1,21 +1,17 @@
 import React, { useState } from 'react';
-import { Head } from '@inertiajs/react'; // Removed useForm!
+import { Head } from '@inertiajs/react';
 import MultimediaLayout from '@/Layouts/MultimediaLayout';
 import AssetGrid from '@/Components/AssetsGrid';
 
 export default function KaryaKreatif({ assets }) {
-    // We only need one simple state now to toggle the instructions!
     const [showInstructions, setShowInstructions] = useState(false);
+    const [activeFilter, setActiveFilter] = useState('All');
 
-    const demoAssets = [
-        { asset_id: 1, category: 'Artworks', views: 3420, file_path: 'demo-art.jpg' },
-        { asset_id: 2, category: 'Posters', views: 1205, file_path: 'demo-poster.jpg' },
-        { asset_id: 3, category: 'Videos', views: 8900, file_path: 'demo-video.mp4' },
-        { asset_id: 4, category: 'Animations', views: 450, file_path: 'demo-anim.mp4' },
-        { asset_id: 5, category: 'Artworks', views: 2100, file_path: 'demo-art-2.jpg' }
-    ];
+    const filterCategories = ['All', 'Artworks', 'Posters', 'Videos', 'Animations'];
 
-    const displayAssets = assets && assets.length > 0 ? assets : demoAssets;
+    const displayAssets = activeFilter === 'All'
+        ? assets
+        : assets.filter(asset => asset.category?.toLowerCase() === activeFilter.toLowerCase());
 
     return (
         <MultimediaLayout>
@@ -47,7 +43,6 @@ export default function KaryaKreatif({ assets }) {
                     </button>
                 </header>
 
-                {/* Email Instructions Panel */}
                 {showInstructions && (
                     <div className="bg-blue-50/50 dark:bg-slate-900 p-6 md:p-8 rounded-3xl border border-blue-100 dark:border-slate-800 shadow-sm space-y-6">
                         <div className="border-b border-blue-100 dark:border-slate-800 pb-4 mb-4 flex items-center gap-4">
@@ -105,7 +100,29 @@ export default function KaryaKreatif({ assets }) {
                     </div>
                 )}
 
-                <AssetGrid assets={displayAssets} />
+                <div className="flex justify-end border-b border-slate-100 dark:border-slate-800/60 pb-4">
+                    <select
+                        value={activeFilter}
+                        onChange={(e) => setActiveFilter(e.target.value)}
+                        className="w-full max-w-xs bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg border-none pl-3 pr-8 py-1.5 text-xs font-semibold uppercase tracking-wide focus:ring-1 focus:ring-blue-500 transition-all cursor-pointer"
+                    >
+                        {filterCategories.map((category) => (
+                            <option key={category} value={category}>
+                                {category === 'All' ? 'Semua Kategori' : category}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                {displayAssets.length > 0 ? (
+                    <AssetGrid assets={displayAssets} />
+                ) : (
+                    <div className="text-center py-16 bg-slate-50 dark:bg-slate-900/40 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
+                        <p className="text-slate-400 dark:text-slate-500 font-medium">
+                            Tiada kandungan ditemui untuk kategori ini.
+                        </p>
+                    </div>
+                )}
             </div>
         </MultimediaLayout>
     );
