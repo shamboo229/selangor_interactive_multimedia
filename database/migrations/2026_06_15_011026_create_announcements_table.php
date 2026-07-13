@@ -20,13 +20,6 @@
                 $table->boolean('is_active')->default(true);
                 $table->timestamps();
             });
-
-            DB::table('announcements')->insert([
-                'admin_id'   => 1,
-                'content'    => 'Selamat Datang ke SIM Workspace!',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
         }
 
         public function down(): void
