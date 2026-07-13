@@ -37,7 +37,7 @@ export default function MultimediaLayout({ children }) {
                     <div className="flex items-center justify-between h-20 relative">
                         <div className="flex-1 flex items-center justify-start">
                             <Link href="/" className="flex items-center gap-3 group">
-                                <div className="bg-slate-900 dark:bg-red-600 w-12 h-12 rounded-xl flex items-center justify-center transition-transform group-hover:rotate-6 p-1">
+                                <div className= "w-14 h-14 rounded-xl flex items-center justify-center transition-transform group-hover:rotate-6 p-1">
                                     <img
                                         src={selangorLogo}
                                         alt="Jata Negeri Selangor"

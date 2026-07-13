@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
+import selangorLogo from '@/Jata_Negeri_Selangor_2025.png';
 
 export default function AdminLayout({ auth, children }) {
     const { url } = usePage();
@@ -11,10 +12,14 @@ export default function AdminLayout({ auth, children }) {
         <div className="min-h-screen bg-slate-50 flex font-sans text-slate-900 selection:bg-red-500 selection:text-white overflow-hidden">
             <aside className={`bg-[#0b1121] text-slate-400 flex flex-col border-r border-slate-800 overflow-hidden transition-all duration-300 ease-in-out whitespace-nowrap ${isSidebarOpen ? 'w-[280px]' : 'w-0 border-none'}`}>
                 <div className="h-20 flex items-center px-8 border-b border-slate-800/60 shrink-0">
-                    <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-red-700 rounded-lg flex items-center justify-center mr-3 shadow-lg shadow-red-500/20 shrink-0">
-                        <span className="text-white font-black text-xs">SIM</span>
+                    <div className= "w-14 h-14 rounded-xl flex items-center justify-center transition-transform group-hover:rotate-6 p-1">
+                        <img
+                            src={selangorLogo}
+                            alt="Jata Negeri Selangor"
+                            className="w-full h-full object-contain"
+                        />
                     </div>
-                    <span className="text-white font-bold text-lg tracking-wide">Workspace</span>
+                    <span className="text-white font-bold text-lg tracking-wide">SIM DASHBOARD</span>
                 </div>
 
                 <nav className="flex-1 px-4 py-8 space-y-1 overflow-y-auto overflow-x-hidden">
