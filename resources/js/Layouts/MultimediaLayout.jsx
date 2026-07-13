@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
+import selangorLogo from '@/Jata_Negeri_Selangor_2025.png';
 
 export default function MultimediaLayout({ children }) {
     const { url } = usePage();
@@ -36,8 +37,12 @@ export default function MultimediaLayout({ children }) {
                     <div className="flex items-center justify-between h-20 relative">
                         <div className="flex-1 flex items-center justify-start">
                             <Link href="/" className="flex items-center gap-3 group">
-                                <div className="bg-slate-900 dark:bg-red-600 w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:rotate-6">
-                                    <span className="font-black text-base text-white">SIM</span>
+                                <div className="bg-slate-900 dark:bg-red-600 w-12 h-12 rounded-xl flex items-center justify-center transition-transform group-hover:rotate-6 p-1">
+                                    <img
+                                        src={selangorLogo}
+                                        alt="Jata Negeri Selangor"
+                                        className="w-full h-full object-contain"
+                                    />
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="font-black text-lg tracking-tighter leading-none dark:text-white">
