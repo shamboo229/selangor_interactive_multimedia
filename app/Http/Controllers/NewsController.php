@@ -23,7 +23,7 @@ class NewsController extends Controller
             'headline' => 'required|string|max:255',
             'resource' => 'required|string|max:255',
             'publish_date' => 'required|date',
-            'content' => 'required|string|max:255',
+            'content' => 'required|string',
             'is_featured' => 'boolean',
             'image' => 'nullable|image|max:2048',
         ]);

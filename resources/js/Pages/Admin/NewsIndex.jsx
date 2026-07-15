@@ -78,7 +78,6 @@ export default function NewsIndex({ auth, initialNews = [] }) {
         }
     };
 
-    // Client-side search filtration engine
     const filteredNews = initialNews.filter((news) => {
         const query = searchQuery.toLowerCase();
         const headline = news.headline?.toLowerCase() || '';
@@ -91,7 +90,6 @@ export default function NewsIndex({ auth, initialNews = [] }) {
             <Head title="News Management - SIM Workspace" />
 
             <div className="max-w-7xl mx-auto space-y-6">
-                {/* Header Block featuring responsive input wrapper layout */}
                 <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">News Management</h1>

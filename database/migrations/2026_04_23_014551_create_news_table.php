@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('news_id');
             $table->foreignId('admin_id')->constrained('admins', 'admin_id')->onDelete('cascade');
             $table->string('headline');
-            $table->string('content');
+            $table->text('content');
             $table->integer('is_featured')->default('0');
             $table->date('publish_date');
             $table->string('resource');
